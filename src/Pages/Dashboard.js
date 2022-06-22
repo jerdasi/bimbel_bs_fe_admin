@@ -19,17 +19,20 @@ import "../index.css";
 ChartJS.register(...registerables);
 const Dashboard = () => {
     return (
-        <div className="w-full md:w-screen md:h-screen md:flex p-2 md:p-0">
+        <div className="w-full md:w-screen md:h-screen md:flex p-2 pb-16 md:p-0">
             <SideBar />
             {/* <Summary /> */}
             <div className="w-full">
-                <h1 className="text-2xl font-bold">
-                    <span className="text-merah-bs">Quality</span> More Than{" "}
-                    <span className="text-merah-bs">Quantity</span>
-                </h1>
-                <div className="summary-wrapper my-4 w-full">
-                    <div className="analytic-wrapper h-96 flex flex-col mb-4">
-                        <h1 className="text-lg md:text-lg font-semibold text-merah-bs">
+                <div className="flex gap-4 items-center">
+                    <img src="./images/logo-bs.png" alt="" className="h-12" />
+                    <h1 className="hidden text-2xl font-bold w-1/2">
+                        <span className="text-merah-bs">Quality</span> More Than{" "}
+                        <span className="text-merah-bs">Quantity</span>
+                    </h1>
+                </div>
+                <div className="summary-wrapper my-4 w-full mb-8">
+                    <div className="analytic-wrapper h-96 flex flex-col mb-4 border-t border-biru-bs pt-4">
+                        <h1 className="text-2xl md:text-lg font-semibold text-merah-bs">
                             Riwayat Pendaftaran
                         </h1>
                         <p className="text-sm">1012 Pendaftaran Terjadi</p>
@@ -79,8 +82,8 @@ const Dashboard = () => {
                             />
                         </div>
                     </div>
-                    <div className="jenjang-wrapper h-48 flex flex-col mb-4">
-                        <h1 className="text-lg md:text-lg font-semibold text-merah-bs">
+                    <div className="jenjang-wrapper h-48 flex flex-col mb-4 border-t border-biru-bs pt-4">
+                        <h1 className="text-2xl md:text-lg font-semibold text-merah-bs">
                             Jenjang Pendidikan
                         </h1>
                         <p className="text-sm">
@@ -147,8 +150,8 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div className="w-full md:w-1/4 h-96 flex flex-col">
-                <h1 className="text-lg md:text-lg font-semibold text-merah-bs">
+            <div className="w-full md:w-1/4 h-96 flex flex-col border-t border-biru-bs pt-4">
+                <h1 className="text-2xl md:text-lg font-semibold text-merah-bs">
                     Paket Bimbingan
                 </h1>
                 <p className="text-sm">12 Paket Bimbingan Terdaftar</p>

@@ -27,7 +27,7 @@ export default function SideBar() {
         });
     };
     return (
-        <div className="w-full md:w-1/5 h-16 md:h-full fixed md:static bottom-0 md:p-4 flex flex-col justify-center items-center bg-biru-bs">
+        <div className="w-full md:w-1/5 h-16 md:h-full fixed md:static left-0 bottom-0 md:p-4 flex flex-col justify-center items-center bg-biru-bs">
             <div className="hidden md:flex w-full h-16 items-center gap-2">
                 <img
                     src="images/logo-simbol.png"
@@ -43,7 +43,7 @@ export default function SideBar() {
                         Home
                     </h3>
                     <ul>
-                        <li className="w-auto md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                        <li className="w-auto md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
                             <i class="fas fa-gauge text-2xl md:text-lg md:mr-2"></i>
                             <a href="" className="hidden md:inline">
                                 Dashboard
@@ -56,25 +56,25 @@ export default function SideBar() {
                         Fitur
                     </h3>
                     <ul className="flex md:flex-col md:gap-1 justify-between">
-                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
                             <i class="fa-solid fa-graduation-cap text-2xl md:text-lg md:mr-2"></i>
                             <a href="" className="hidden md:inline">
                                 Peserta Didik
                             </a>
                         </li>
-                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
                             <i class="fas fa-chart-line text-2xl md:text-lg md:mr-2"></i>
                             <a href="" className="hidden md:inline">
                                 Kelola Transaksi
                             </a>
                         </li>
-                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
                             <i class="fa-solid fa-comment text-2xl md:text-lg md:mr-2"></i>
                             <a href="" className="hidden md:inline">
                                 Kelola Testimoni
                             </a>
                         </li>
-                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
                             <i class="fas fa-chalkboard-teacher text-2xl md:text-lg md:mr-2"></i>
                             <a href="" className="hidden md:inline">
                                 Kelola Paket Bimbingan
@@ -87,7 +87,7 @@ export default function SideBar() {
                         Akun
                     </h3>
                     <ul>
-                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
                             <i class="fa-solid fa-arrow-right-from-bracket text-2xl md:text-lg md:mr-2"></i>
                             <a href="" className="hidden md:inline">
                                 Logout
