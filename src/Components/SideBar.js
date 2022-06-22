@@ -27,13 +27,77 @@ export default function SideBar() {
         });
     };
     return (
-        <div className="w-1/5 h-full border border-black">
-            <img
-                src="images/logo-simbol.png"
-                alt="logo-bimbel"
-                className="h-16 w-auto m-4"
-            />
-            <ul className="main-menu">
+        <div className="w-full md:w-1/5 h-16 md:h-full fixed md:static bottom-0 md:p-4 flex flex-col justify-center items-center bg-biru-bs">
+            <div className="hidden md:flex w-full h-16 items-center gap-2">
+                <img
+                    src="images/logo-simbol.png"
+                    alt="logo-bimbel"
+                    className="h-full w-auto"
+                />
+                <h1 className="font-bold text-3xl">Beta Smart</h1>
+            </div>
+
+            <div className="w-full h-full md:mt-16 list-menu flex md:flex-col justify-center md:justify-start md:gap-4">
+                <div className="sub-menu flex md:block items-center">
+                    <h3 className="hidden md:block font-light opacity-50">
+                        Home
+                    </h3>
+                    <ul>
+                        <li className="w-auto md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                            <i class="fas fa-gauge text-2xl md:text-lg md:mr-2"></i>
+                            <a href="" className="hidden md:inline">
+                                Dashboard
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div className="sub-menu flex md:block items-center">
+                    <h3 className="hidden md:block font-light opacity-50">
+                        Fitur
+                    </h3>
+                    <ul className="flex md:flex-col md:gap-1 justify-between">
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                            <i class="fa-solid fa-graduation-cap text-2xl md:text-lg md:mr-2"></i>
+                            <a href="" className="hidden md:inline">
+                                Peserta Didik
+                            </a>
+                        </li>
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                            <i class="fas fa-chart-line text-2xl md:text-lg md:mr-2"></i>
+                            <a href="" className="hidden md:inline">
+                                Kelola Transaksi
+                            </a>
+                        </li>
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                            <i class="fa-solid fa-comment text-2xl md:text-lg md:mr-2"></i>
+                            <a href="" className="hidden md:inline">
+                                Kelola Testimoni
+                            </a>
+                        </li>
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                            <i class="fas fa-chalkboard-teacher text-2xl md:text-lg md:mr-2"></i>
+                            <a href="" className="hidden md:inline">
+                                Kelola Paket Bimbingan
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div className="sub-menu flex md:block items-center">
+                    <h3 className="hidden md:block font-light opacity-50">
+                        Akun
+                    </h3>
+                    <ul>
+                        <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-5 md:p-3 rounded-md flex items-center justify-center md:block">
+                            <i class="fa-solid fa-arrow-right-from-bracket text-2xl md:text-lg md:mr-2"></i>
+                            <a href="" className="hidden md:inline">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            {/* <ul className="main-menu">
                 <li className="item border-y border-black" id="menu">
                     <a
                         href="#menu"
@@ -99,7 +163,7 @@ export default function SideBar() {
                         Keluar
                     </a>
                 </li>
-            </ul>
+            </ul> */}
         </div>
     );
 }

@@ -12,3 +12,14 @@
 .item:target div{
     max-height: 100vh;
 }
+
+.swiper {
+    margin: 0 !important;
+    height: 90% !important;
+}
+
+.swiper-slide{
+    width: 75% !important;
+    height: 100% !important;
+    border: 1px solid black;
+}
