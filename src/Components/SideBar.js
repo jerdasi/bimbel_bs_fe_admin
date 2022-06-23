@@ -4,6 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function SideBar() {
     const navigate = useNavigate();
+
+    const handleNavigatePage = (link) => {
+        navigate(link);
+    };
+
     const handleLogOut = (event) => {
         event.preventDefault();
         Swal.fire({
@@ -43,12 +48,15 @@ export default function SideBar() {
                         Home
                     </h3>
                     <ul>
-                        <Link to="/dashboard">
-                            <li className="w-auto md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
-                                <i class="fas fa-gauge text-2xl md:text-lg md:mr-2"></i>
+                        <li
+                            className="w-auto md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
+                            onClick={() => handleNavigatePage("/dashboard")}
+                        >
+                            <i class="fas fa-gauge text-2xl md:text-lg md:mr-2"></i>
+                            <Link to="/dashboard" className="hidden md:inline">
                                 Dashboard
-                            </li>
-                        </Link>
+                            </Link>
+                        </li>
                     </ul>
                 </div>
                 <div className="sub-menu flex md:block items-center">
@@ -56,33 +64,58 @@ export default function SideBar() {
                         Fitur
                     </h3>
                     <ul className="flex md:flex-col md:gap-1 justify-between">
-                        <Link to="/peserta-didik" className="hidden md:inline">
-                            <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
-                                <i class="fa-solid fa-graduation-cap text-2xl md:text-lg md:mr-2"></i>
+                        <li
+                            className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
+                            onClick={() => handleNavigatePage(`/peserta-didik`)}
+                        >
+                            <i class="fa-solid fa-graduation-cap text-2xl md:text-lg md:mr-2"></i>
+                            <Link
+                                to="/peserta-didik"
+                                className="hidden md:inline"
+                            >
                                 Peserta Didik
-                            </li>
-                        </Link>
-
-                        <Link to="/kelola-pendaftaran">
-                            <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
-                                <i class="fas fa-chart-line text-2xl md:text-lg md:mr-2"></i>
+                            </Link>
+                        </li>
+                        <li
+                            className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
+                            onClick={() =>
+                                handleNavigatePage(`/kelola-pendaftaran`)
+                            }
+                        >
+                            <i class="fas fa-chart-line text-2xl md:text-lg md:mr-2"></i>
+                            <Link
+                                to="/kelola-pendaftaran"
+                                className="hidden md:inline"
+                            >
                                 Kelola Transaksi
-                            </li>
-                        </Link>
-
-                        <Link to="/kelola-testimoni">
-                            <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
-                                <i class="fa-solid fa-comment text-2xl md:text-lg md:mr-2"></i>
+                            </Link>
+                        </li>
+                        <li
+                            className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
+                            onClick={() =>
+                                handleNavigatePage(`/kelola-testimoni`)
+                            }
+                        >
+                            <i class="fa-solid fa-comment text-2xl md:text-lg md:mr-2"></i>
+                            <Link
+                                to="/kelola-testimoni"
+                                className="hidden md:inline"
+                            >
                                 Kelola Testimoni
-                            </li>
-                        </Link>
-
-                        <Link to="/kelola-paket">
-                            <li className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block">
-                                <i class="fas fa-chalkboard-teacher text-2xl md:text-lg md:mr-2"></i>
+                            </Link>
+                        </li>
+                        <li
+                            className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
+                            onClick={() => handleNavigatePage(`/kelola-paket`)}
+                        >
+                            <i class="fas fa-chalkboard-teacher text-2xl md:text-lg md:mr-2"></i>
+                            <Link
+                                to="/kelola-paket"
+                                className="hidden md:inline"
+                            >
                                 Kelola Paket Bimbingan
-                            </li>
-                        </Link>
+                            </Link>
+                        </li>
                     </ul>
                 </div>
                 <div className="sub-menu flex md:block items-center">
