@@ -144,14 +144,6 @@ export default function Table({ sumber }) {
                     </tbody>
                 </table>
             </div>
-            <div className="w-1/2 md:w-1/6 inline fixed bottom-20 md:bottom-10 right-4 md:right-10 flex justify-end">
-                <button className="w-5/6 bg-merah-bs text-white rounded-lg text-lg flex items-center justify-center p-2">
-                    <span className="text-lg mr-2">
-                        <i class="fa-solid fa-plus"></i>
-                    </span>{" "}
-                    Data Siswa
-                </button>
-            </div>
         </>
     );
 }

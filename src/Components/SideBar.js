@@ -32,7 +32,7 @@ export default function SideBar() {
         });
     };
     return (
-        <div className="w-full md:w-1/5 h-16 md:h-full fixed md:static left-0 bottom-0 md:p-4 flex flex-col justify-center items-center bg-biru-bs z-50">
+        <div className="w-full md:w-1/5 h-16 md:h-full fixed md:static left-0 bottom-0 md:p-4 flex flex-col justify-center items-center bg-biru-bs z-10">
             <div className="hidden md:flex w-full h-16 items-center gap-2">
                 <img
                     src="images/logo-simbol.png"
