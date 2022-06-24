@@ -1,8 +1,111 @@
 import React, { useState } from "react";
-import axios from "axios";
 
 export default function FormPendaftaran() {
     const [show, setShow] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
+    const [formValue, setFormValue] = useState({
+        id_siswa: -1,
+        id_paket: -1,
+        tanggal_pendaftaran: "",
+        total_pembayaran: null,
+    });
+
+    const [formPendaftaran, setFormPendaftaran] = useState({
+        nama_siswa: "",
+    });
+    const siswa = [
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Bambang Anaknya PakBudi",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+        {
+            nama: "Jeremia Daniel Silitonga",
+            asal_sekolah: "SMP Negeri 001 Kongbeng",
+            jenjang: "Sekolah Dasar",
+        },
+    ];
+
+    const [filteredSiswa, setFilteredSiswa] = useState([...siswa]);
+
+    const handleSearch = (event) => {
+        let value = event.target.value;
+
+        setFormPendaftaran({
+            ...formPendaftaran,
+            nama_siswa: value,
+        });
+
+        if (!value) {
+            setFilteredSiswa([...siswa]);
+        } else {
+            let result = [...siswa].filter(
+                (item) =>
+                    item.nama.toLowerCase().indexOf(value.toLowerCase()) !== -1
+            );
+            setFilteredSiswa(result);
+        }
+    };
 
     const handleShow = () => {
         setShow(!show);
@@ -19,7 +122,7 @@ export default function FormPendaftaran() {
                     <span className="text-lg mr-2">
                         <i class="fa-solid fa-plus"></i>
                     </span>{" "}
-                    Data Siswa
+                    Pendaftaran Siswa
                 </button>
             </div>
             <div
@@ -45,75 +148,76 @@ export default function FormPendaftaran() {
                             </div>
                         </div>
                         <div className="body-form h-[80%] overflow-scroll p-4">
-                            <div className="row mb-3">
+                            <div className="row mb-6">
                                 <div className="title mb-1">
-                                    <p>Nama</p>
+                                    <p>Cari Siswa</p>
                                 </div>
-                                <div className="input-field">
+                                <div className="input-field relative">
                                     <input
                                         type="text"
                                         name="nama_siswa"
                                         id="nama_siswa"
                                         className="p-2 w-full rounded-md border border-abu-bs"
                                         placeholder="cth: Bambang Anak Pak Budi"
+                                        onChange={(e) => {
+                                            handleSearch(e);
+                                        }}
+                                        value={formPendaftaran.nama_siswa}
                                     />
+                                    <div className="absolute bottom-0 right-0 w-8 h-full flex items-center cursor-pointer">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div className="row mb-3">
-                                <div className="title mb-1">
-                                    <p>Tempat, Tanggal Lahir</p>
-                                </div>
-                                <div className="input-field flex gap-2">
-                                    <input
-                                        type="text"
-                                        name="nama_siswa"
-                                        id="nama_siswa"
-                                        className="p-2 w-1/2 rounded-md border border-abu-bs"
-                                        placeholder="cth: Medan"
-                                    />
-                                    <input
-                                        type="date"
-                                        name="nama_siswa"
-                                        id="nama_siswa"
-                                        className="p-2 w-1/2 rounded-md border border-abu-bs"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="row mb-3">
-                                <div className="title mb-1">
-                                    <p>Alamat</p>
-                                </div>
-                                <div className="input-field">
-                                    <textarea
-                                        name="alamat"
-                                        id=""
-                                        rows="5"
-                                        className="p-2 border border-abu-bs w-full rounded-md"
-                                        placeholder="cth: Jl. Menuju Hati Yang Ikhlas dan Bersih"
-                                    ></textarea>
+                                <div className="result-search w-full h-48 border-x border-b border-abu-bs rounded-md p-2 pt-0 overflow-auto">
+                                    <h1 className="font-semibold sticky top-0 left-0 backdrop-blur-sm py-2 bg-white/30">
+                                        Nama Siswa
+                                    </h1>
+                                    <ul>
+                                        {filteredSiswa.length ? (
+                                            filteredSiswa.map((item) => (
+                                                <li
+                                                    className="p-2 hover:bg-merah-bs hover:text-white hover:rounded-md border-b border-abu-bs"
+                                                    onClick={() =>
+                                                        setFormPendaftaran({
+                                                            ...formPendaftaran,
+                                                            nama_siswa:
+                                                                item.nama,
+                                                        })
+                                                    }
+                                                >
+                                                    {`${item.nama} - ${item.asal_sekolah}`}
+                                                </li>
+                                            ))
+                                        ) : (
+                                            <p className="text-center opacity-50">
+                                                Tidak ada siswa
+                                            </p>
+                                        )}
+                                    </ul>
                                 </div>
                             </div>
 
                             <div className="row mb-3 flex gap-2">
-                                <div className="row mb-3 w-1/2">
-                                    <div className="title mb-1">
-                                        <p>Kelas</p>
-                                    </div>
-                                    <div className="input-field">
-                                        <input
-                                            type="text"
-                                            name="nama_siswa"
-                                            id="nama_siswa"
-                                            className="p-2 w-full rounded-md border border-abu-bs"
-                                            placeholder="cth: VII"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-3 w-1/2">
+                                <div className="row mb-3 w-1/3">
                                     <div className="title mb-1">
                                         <p>Jenjang</p>
+                                    </div>
+                                    <div className="input-field">
+                                        <select
+                                            name="jenjang"
+                                            id="jenjang"
+                                            disabled="disabled"
+                                            className="p-2 w-full rounded-md border border-abu-bs"
+                                        >
+                                            <option value="">
+                                                Sekolah Dasar
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="row mb-3 w-2/3">
+                                    <div className="title mb-1">
+                                        <p>Pilihan Paket Bimbingan Belajar</p>
                                     </div>
                                     <div className="input-field">
                                         <select
@@ -128,112 +232,36 @@ export default function FormPendaftaran() {
                                             >
                                                 Pilih Salah Satu
                                             </option>
-                                            <option value="SD">
-                                                Sekolah Dasar - SD
+                                            <option value="reguler">
+                                                Sekolah Dasar - Bimbingan
+                                                Reguler
                                             </option>
-                                            <option value="SD">
-                                                Sekolah Menengah Pertama - SMP
+                                            <option value="private">
+                                                Sekolah Dasar - Bimbingan
+                                                Private
                                             </option>
-                                            <option value="SD">
-                                                Sekolah Menengah Dasar - SD
+                                            <option value="intensive">
+                                                Sekolah Dasar - Bimbingan
+                                                Intensive
                                             </option>
-                                            <option value="SD">
-                                                Belum Sekolah
-                                            </option>
-                                            <option value="SD">TK</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="row mb-3">
+                            <div className="row mb-6">
                                 <div className="title mb-1">
-                                    <p>Asal Sekolah</p>
+                                    <p>Total Pembayaran</p>
                                 </div>
-                                <div className="input-field">
+                                <div className="input-field relative">
                                     <input
                                         type="text"
-                                        name="asal_sekolah"
-                                        id="asal_sekolah"
+                                        name="pembayaran"
+                                        id="pembayaran"
                                         className="p-2 w-full rounded-md border border-abu-bs"
-                                        placeholder="cth: Sekolah Dasar 002 Berau"
+                                        disabled
+                                        value={0}
                                     />
-                                </div>
-                            </div>
-
-                            <div className="row mb-3">
-                                <div className="title mb-1">
-                                    <p>Foto</p>
-                                </div>
-                                <div className="input-field">
-                                    <input
-                                        type="file"
-                                        name="foto_siswa"
-                                        id="foto_siswa"
-                                        className="p-2 w-full rounded-md border border-abu-bs"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="row mb-3 flex gap-2">
-                                <div className="row mb-3 w-1/2">
-                                    <div className="title mb-1">
-                                        <p>Nama Ayah</p>
-                                    </div>
-                                    <div className="input-field">
-                                        <input
-                                            type="text"
-                                            name="nama_ayah"
-                                            id="nama_ayah"
-                                            className="p-2 w-full rounded-md border border-abu-bs"
-                                            placeholder="cth: Budi Bapaknya Bambang"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-3 w-1/2">
-                                    <div className="title mb-1">
-                                        <p>Nama Ibu</p>
-                                    </div>
-                                    <div className="input-field">
-                                        <input
-                                            type="text"
-                                            name="nama_ibu"
-                                            id="nama_ibu"
-                                            className="p-2 w-full rounded-md border border-abu-bs"
-                                            placeholder="cth: Angel Mamaknya Bambang"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="row mb-3 flex gap-2">
-                                <div className="row mb-3 w-1/2">
-                                    <div className="title mb-1">
-                                        <p>Telepon Ayah</p>
-                                    </div>
-                                    <div className="input-field">
-                                        <input
-                                            type="text"
-                                            name="telepon_ayah"
-                                            id="telepon_ayah"
-                                            className="p-2 w-full rounded-md border border-abu-bs"
-                                            placeholder="081212345678"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-3 w-1/2">
-                                    <div className="title mb-1">
-                                        <p>Telepon Ibu</p>
-                                    </div>
-                                    <div className="input-field">
-                                        <input
-                                            type="text"
-                                            name="telepon_ibu"
-                                            id="telepon_ibu"
-                                            className="p-2 w-full rounded-md border border-abu-bs"
-                                            placeholder="081234567890"
-                                        />
-                                    </div>
                                 </div>
                             </div>
                         </div>

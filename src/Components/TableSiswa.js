@@ -18,7 +18,16 @@ export default function TableSiswa() {
                     Kelola Data Peserta Didik
                 </h1>
                 <div className="h-full md:h-full overflow-auto">
-                    <Table sumber={user} />
+                    <Table
+                        sumber={user}
+                        judulTabel={[
+                            "ID",
+                            "Name",
+                            "Username",
+                            "Email",
+                            "Website",
+                        ]}
+                    />
                 </div>
             </div>
         </>

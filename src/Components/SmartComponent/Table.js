@@ -3,7 +3,7 @@ import _ from "lodash";
 import propTypes from "prop-types";
 
 const pageSize = 5;
-export default function Table({ sumber }) {
+export default function Table({ sumber = [], judulTabel = [] }) {
     const [filtered, setFiltered] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageCount, setPageCount] = useState(0);
@@ -100,11 +100,9 @@ export default function Table({ sumber }) {
                 <table className="w-full h-full basis-full border-collapse overflow-y-auto">
                     <thead>
                         <tr className="h-16">
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Website</th>
+                            {judulTabel.map((item) => (
+                                <th>{item}</th>
+                            ))}
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -150,4 +148,5 @@ export default function Table({ sumber }) {
 
 Table.propTypes = {
     sumber: propTypes.array.isRequired,
+    judulTabel: propTypes.array.isRequired,
 };
