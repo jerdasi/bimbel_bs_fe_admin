@@ -1,25 +1,36 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { PaketContext } from "../Context/PaketBimbingan";
 
 export default function FormJenjang(props) {
-    const [show, setShow] = useState(false);
-    const [jenjang, setJenjang] = useState({
-        nama_jenjang: "",
-        akronim: "",
-        deskripsi: "",
-        harga: 0,
-    });
+    const {
+        jenjangItem,
+        setJenjangItem,
+        show,
+        setShow,
+        formPurpose,
+        setFormPurpose,
+    } = useContext(PaketContext);
 
+    // Fungsi untuk ToggleForm
     const handleShow = () => {
+        if (show) {
+            setJenjangItem({
+                nama_jenjang: "",
+                akronim: "",
+                deskripsi: "",
+            });
+        }
         setShow(!show);
-        console.log(show);
     };
 
-    const handleAddJenjang = (event) => {
+    // Fungsi untuk Tambah Jenjang
+    const handleAddEditJenjang = (event) => {
         event.preventDefault();
-        const { nama_jenjang, akronim, harga } = jenjang;
-        if (nama_jenjang !== "" && akronim !== "" && harga !== 0) {
-            props.handleTambahJenjang(jenjang);
+        const { nama_jenjang, akronim } = jenjangItem;
+        if (nama_jenjang !== "" && akronim !== "") {
+            props.handleTambahEditJenjang(jenjangItem);
+            handleShow();
         } else {
             alert("Perhatikan Input Data");
         }
@@ -30,7 +41,10 @@ export default function FormJenjang(props) {
             <div className="w-1/2 md:w-1/6 inline fixed bottom-20 md:bottom-10 right-4 md:right-10 flex justify-end">
                 <button
                     className="w-5/6 bg-merah-bs text-white rounded-lg text-lg flex items-center justify-center p-2"
-                    onClick={handleShow}
+                    onClick={() => {
+                        setFormPurpose("Simpan");
+                        handleShow();
+                    }}
                 >
                     <span className="text-lg mr-2">
                         <i class="fa-solid fa-plus"></i>
@@ -51,7 +65,8 @@ export default function FormJenjang(props) {
                     >
                         <div className="header-form flex items-center relative mb-2 border-b border-abu-bs h-[10%] p-4">
                             <h1 className="text-2xl font-bold text-merah-bs tracking-widest">
-                                Tambah Jenjang Pendidikan
+                                {formPurpose === "Simpan" ? "Tambah" : "Edit"}{" "}
+                                Jenjang Pendidikan
                             </h1>
                             <div
                                 className="close-button text-xl absolute top-0 right-4 cursor-pointer font-bold"
@@ -74,12 +89,13 @@ export default function FormJenjang(props) {
                                             className="p-2 w-full rounded-md border border-abu-bs"
                                             placeholder="cth: Sekolah Menengah Pertama"
                                             onChange={(e) =>
-                                                setJenjang({
-                                                    ...jenjang,
+                                                setJenjangItem({
+                                                    ...jenjangItem,
                                                     nama_jenjang:
                                                         e.target.value,
                                                 })
                                             }
+                                            value={jenjangItem.nama_jenjang}
                                         />
                                     </div>
                                 </div>
@@ -95,11 +111,12 @@ export default function FormJenjang(props) {
                                             className="p-2 w-full rounded-md border border-abu-bs"
                                             placeholder="cth: SMP"
                                             onChange={(e) =>
-                                                setJenjang({
-                                                    ...jenjang,
+                                                setJenjangItem({
+                                                    ...jenjangItem,
                                                     akronim: e.target.value,
                                                 })
                                             }
+                                            value={jenjangItem.akronim}
                                         />
                                     </div>
                                 </div>
@@ -111,48 +128,31 @@ export default function FormJenjang(props) {
                                 </div>
                                 <div className="input-field">
                                     <textarea
-                                        name="alamat"
-                                        id=""
+                                        name="deskripsi"
+                                        id="deskripsi"
                                         rows="5"
                                         className="p-2 border border-abu-bs w-full rounded-md"
                                         placeholder="cth: Ini adalah paket mantap kali"
                                         onChange={(e) =>
-                                            setJenjang({
-                                                ...jenjang,
+                                            setJenjangItem({
+                                                ...jenjangItem,
                                                 deskripsi: e.target.value,
                                             })
                                         }
+                                        value={jenjangItem.deskripsi}
                                     ></textarea>
-                                </div>
-                            </div>
-
-                            <div className="row mb-3">
-                                <div className="title mb-1">
-                                    <p>Harga</p>
-                                </div>
-                                <div className="input-field">
-                                    <input
-                                        type="number"
-                                        name="harga"
-                                        id="harga"
-                                        className="p-2 w-full rounded-md border border-abu-bs"
-                                        placeholder="cth: 180000"
-                                        onChange={(e) =>
-                                            setJenjang({
-                                                ...jenjang,
-                                                harga: parseInt(e.target.value),
-                                            })
-                                        }
-                                    />
                                 </div>
                             </div>
                         </div>
                         <div className="footer-form w-full h-[10%] flex items-center justify-end bg-biru-bs p-4">
                             <button
                                 className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
-                                onClick={handleAddJenjang}
+                                onClick={(e) => {
+                                    setShow();
+                                    handleAddEditJenjang(e);
+                                }}
                             >
-                                Simpan
+                                {formPurpose}
                             </button>
                         </div>
                     </form>

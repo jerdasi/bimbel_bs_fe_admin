@@ -1,69 +1,148 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import FormJenjang from "./FormJenjang";
 import Swal from "sweetalert2";
+import { PaketContext } from "../Context/PaketBimbingan";
 
 export default function TabelPaket() {
     const [jenjang, setJenjang] = useState([]);
     const [paketBimbingan, setPaketBimbingan] = useState([]);
 
-    // Axios Handle
-    const getData = async (route) => {
-        const res = await axios.get("http://localhost:3000/" + route);
-        return await res.data.data;
+    const {
+        jenjangItem,
+        setJenjangItem,
+        show,
+        setShow,
+        formPurpose,
+        setFormPurpose,
+    } = useContext(PaketContext);
+
+    const showPopUp = (title, description, icon) => {
+        Swal.fire(`${title}!`, `${description}`, `${icon}`);
     };
 
-    // Axios Handle Post
-    const postData = async (route, data) => {
-        const res = await axios.post("http://localhost:3000/" + route, data);
-        // console.log(res.data.data);
-        return await res.data.data;
-    };
-
-    // Axios Handle Delete
-    const deleteData = async (route, key) => {
+    // Axios Handle Request
+    const handleRequest = async ({
+        method = "GET",
+        url = "",
+        data = {},
+        key = -1,
+    }) => {
+        let endpoint = `http://localhost:3000/${url}${
+            key !== -1 ? `/${key}` : ""
+        }`;
         let res, information;
         try {
-            res = await axios.delete(`http://localhost:3000/${route}/${key}`);
+            if (
+                method.toUpperCase() === "GET" ||
+                method.toUpperCase() === "DELETE"
+            ) {
+                res = await axios({
+                    method,
+                    url: endpoint,
+                });
+            } else if (
+                method.toUpperCase() === "POST" ||
+                method.toUpperCase() === "PUT"
+            ) {
+                res = await axios({
+                    method,
+                    url: endpoint,
+                    data,
+                });
+            }
             information = {
                 status: res.data.status,
                 message: res.data.message,
             };
         } catch (e) {
             information = {
-                status: e.response.data.status,
-                message: e.response.data.message,
+                status: e.response.status,
+                message: e.response.data.message
+                    ? e.response.data.message
+                    : "Data Tidak Tersedia",
             };
         } finally {
-            Swal.fire(
-                `${
-                    information.status === 200 ? "Berhasil" : "Gagal"
-                } Menghapus!`,
-                `${information.message}`,
-                `${information.status === 200 ? "success" : "error"}`
-            );
+            // console.log(data, key);
+            if (method !== "GET") {
+                showPopUp(
+                    information.status === 200 ? "Berhasil" : "Gagal",
+                    information.message,
+                    information.status === 200 ? "success" : "error"
+                );
+            }
         }
-        return res;
+        // console.log(endpoint);
+
+        return res.data.data;
     };
 
     useEffect(() => {
-        getData("jenjang-pendidikan").then((res) => setJenjang([...res]));
-        getData("paket-bimbingan").then((res) => setPaketBimbingan([...res]));
+        handleRequest({
+            method: "GET",
+            url: "jenjang-pendidikan",
+        }).then((res) => setJenjang([...res]));
+        handleRequest({
+            method: "GET",
+            url: "paket-bimbingan",
+        }).then((res) => setPaketBimbingan([...res]));
     }, []);
 
-    const handleTambahJenjang = (data) => {
-        postData("jenjang-pendidikan", data).then((res) =>
-            setJenjang([...jenjang, res])
-        );
+    // Function Nambah Jenjang
+    const handleTambahEditJenjang = async (data) => {
+        let endpoint = `jenjang-pendidikan${!data.id ? "" : `/${data.id}`}`;
+        let hasil = await handleRequest({
+            method: `${!data.id ? "POST" : "PUT"}`,
+            url: endpoint,
+            data,
+        });
+        let indexLocation = jenjang.findIndex((item) => item.id === data.id);
+        if (indexLocation !== -1) {
+            let arrJenjang = [...jenjang];
+            arrJenjang[indexLocation] = hasil;
+            setJenjang([...arrJenjang]);
+        } else {
+            setJenjang([...jenjang, hasil]);
+        }
     };
 
+    // Function Hapus Jenjang
     const handleHapusJenjang = (key) => {
-        // console.log(key);
-        deleteData("jenjang-pendidikan", key).then((res) => {
-            if (res) {
-                let result = jenjang.filter((item) => item.id !== key);
-                setJenjang([...result]);
+        Swal.fire({
+            title: "Apakah Kamu Yakin?",
+            text: "Kamu akan menghapus jenjang pendidikan ini dan semua paket yang tergabung!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, Saya Yakin!",
+            cancelButtonText: "Ga AH, Saya Ga Yakin ",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleRequest({
+                    method: "DELETE",
+                    url: "jenjang-pendidikan",
+                    key,
+                }).then((res) => {
+                    if (res) {
+                        let result = jenjang.filter((item) => item.id !== key);
+                        setJenjang([...result]);
+                    }
+                });
             }
+        });
+    };
+
+    const handleEditJenjang = async (key) => {
+        setFormPurpose("Edit");
+        let hasil = await handleRequest({
+            method: "GET",
+            url: "jenjang-pendidikan",
+            key,
+        });
+        setShow(!show);
+        setJenjangItem({
+            ...hasil,
         });
     };
 
@@ -81,12 +160,17 @@ export default function TabelPaket() {
                                   className="w-full h-[35vh] flex flex-col my-4"
                                   key={item.id}
                               >
-                                  <div className="w-full h-[10%] md:h-[10%] flex flex-col md:flex-row items-start md:items-center mb-2">
+                                  <div className="w-full md:h-[10%] flex flex-col md:flex-row items-start md:items-center mb-2">
                                       <h1 className="text-2xl w-fit md:w-4/5 h-full font-bold text-black/80 opacity-80">
                                           {item.nama_jenjang}
                                       </h1>
                                       <div className="w-1/2 md:w-1/5 h-full flex gap-2">
-                                          <button className="h-full w-1/2 rounded-md border border-abu-bs hover:bg-abu-bs hover:border-black hover:text-white">
+                                          <button
+                                              className="h-full w-1/2 rounded-md border border-abu-bs hover:bg-abu-bs hover:border-black hover:text-white"
+                                              onClick={() => {
+                                                  handleEditJenjang(item.id);
+                                              }}
+                                          >
                                               Edit
                                           </button>
                                           <button
@@ -138,7 +222,7 @@ export default function TabelPaket() {
                           ))}
                 </div>
             </div>
-            <FormJenjang handleTambahJenjang={handleTambahJenjang} />
+            <FormJenjang handleTambahEditJenjang={handleTambahEditJenjang} />
         </>
     );
 }
