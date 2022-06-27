@@ -15,8 +15,14 @@ export default function FormJenjang(props) {
         console.log(show);
     };
 
-    const handleAddJenjang = () => {
-        props.handleTambahJenjang(jenjang);
+    const handleAddJenjang = (event) => {
+        event.preventDefault();
+        const { nama_jenjang, akronim, harga } = jenjang;
+        if (nama_jenjang !== "" && akronim !== "" && harga !== 0) {
+            props.handleTambahJenjang(jenjang);
+        } else {
+            alert("Perhatikan Input Data");
+        }
     };
 
     return (
@@ -67,6 +73,13 @@ export default function FormJenjang(props) {
                                             id="nama_jenjang"
                                             className="p-2 w-full rounded-md border border-abu-bs"
                                             placeholder="cth: Sekolah Menengah Pertama"
+                                            onChange={(e) =>
+                                                setJenjang({
+                                                    ...jenjang,
+                                                    nama_jenjang:
+                                                        e.target.value,
+                                                })
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -81,6 +94,12 @@ export default function FormJenjang(props) {
                                             id="akronim"
                                             className="p-2 w-full rounded-md border border-abu-bs"
                                             placeholder="cth: SMP"
+                                            onChange={(e) =>
+                                                setJenjang({
+                                                    ...jenjang,
+                                                    akronim: e.target.value,
+                                                })
+                                            }
                                         />
                                     </div>
                                 </div>
@@ -97,6 +116,12 @@ export default function FormJenjang(props) {
                                         rows="5"
                                         className="p-2 border border-abu-bs w-full rounded-md"
                                         placeholder="cth: Ini adalah paket mantap kali"
+                                        onChange={(e) =>
+                                            setJenjang({
+                                                ...jenjang,
+                                                deskripsi: e.target.value,
+                                            })
+                                        }
                                     ></textarea>
                                 </div>
                             </div>
@@ -112,6 +137,12 @@ export default function FormJenjang(props) {
                                         id="harga"
                                         className="p-2 w-full rounded-md border border-abu-bs"
                                         placeholder="cth: 180000"
+                                        onChange={(e) =>
+                                            setJenjang({
+                                                ...jenjang,
+                                                harga: parseInt(e.target.value),
+                                            })
+                                        }
                                     />
                                 </div>
                             </div>
