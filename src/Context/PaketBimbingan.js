@@ -8,16 +8,33 @@ export const PaketProvider = (props) => {
         akronim: "",
         deskripsi: "",
     });
-    const [show, setShow] = useState(false);
+    const [paketItem, setPaketItem] = useState({
+        nama_paket: "",
+        id_jenjang: 0,
+        deskripsi: "",
+        harga: 0,
+    });
+    const [showJenjang, setShowJenjang] = useState(false);
+    const [showPaket, setShowPaket] = useState(false);
     const [formPurpose, setFormPurpose] = useState("Simpan");
+    const [jenjang, setJenjang] = useState([]);
+    const [paketBimbingan, setPaketBimbingan] = useState([]);
 
     return (
         <PaketContext.Provider
             value={{
+                jenjang,
+                setJenjang,
+                paketBimbingan,
+                setPaketBimbingan,
                 jenjangItem,
                 setJenjangItem,
-                show,
-                setShow,
+                paketItem,
+                setPaketItem,
+                showJenjang,
+                setShowJenjang,
+                showPaket,
+                setShowPaket,
                 formPurpose,
                 setFormPurpose,
             }}

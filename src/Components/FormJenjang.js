@@ -6,22 +6,22 @@ export default function FormJenjang(props) {
     const {
         jenjangItem,
         setJenjangItem,
-        show,
-        setShow,
+        showJenjang,
+        setShowJenjang,
         formPurpose,
         setFormPurpose,
     } = useContext(PaketContext);
 
     // Fungsi untuk ToggleForm
     const handleShow = () => {
-        if (show) {
+        if (showJenjang) {
             setJenjangItem({
                 nama_jenjang: "",
                 akronim: "",
                 deskripsi: "",
             });
         }
-        setShow(!show);
+        setShowJenjang(!showJenjang);
     };
 
     // Fungsi untuk Tambah Jenjang
@@ -55,7 +55,7 @@ export default function FormJenjang(props) {
             <div
                 className={[
                     "background w-screen h-screen bg-black bg-opacity-70 flex justify-center items-center top-0 left-0 z-50",
-                    show ? "absolute" : "hidden",
+                    showJenjang ? "absolute" : "hidden",
                 ].join(" ")}
             >
                 <div className="w-5/6 md:w-1/2 box-form h-3/4 overlow-auto">
@@ -148,7 +148,7 @@ export default function FormJenjang(props) {
                             <button
                                 className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
                                 onClick={(e) => {
-                                    setShow();
+                                    setShowJenjang();
                                     handleAddEditJenjang(e);
                                 }}
                             >
