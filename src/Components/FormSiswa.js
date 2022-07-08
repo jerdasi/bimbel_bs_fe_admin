@@ -6,17 +6,17 @@ export default function FormSiswa() {
     const [show, setShow] = useState(false);
     const [jenjang, setJenjang] = useState([]);
     const [formData, setFormData] = useState({
-        nama: "Anonyomous",
-        tempat: "Medan",
-        tanggal_lahir: new Date(),
-        alamat: "Mau Tau Aja",
-        asal_sekolah: "SMP Suka Jadi",
-        fotoPeserta: "",
-        nama_ayah: "Bambang",
-        nama_ibu: "Bwaa",
-        telepon_anak: "0",
-        telepon_ayah: "0",
-        telepon_ibu: "0",
+        nama: "",
+        tempat: "",
+        tanggal_lahir: new Date().toISOString().substring(0,10),
+        alamat: "",
+        asal_sekolah: "",
+        fotoPeserta: null,
+        nama_ayah: "",
+        nama_ibu: "",
+        telepon_anak: "",
+        telepon_ayah: "",
+        telepon_ibu: "",
     })
 
     const handleShow = () => {
@@ -33,12 +33,13 @@ export default function FormSiswa() {
         for (let key in formData){
             form_data.append(key, formData[key])
         }
+        // console.log()
         // // form_data.append("foto", formData.foto)
         // for (const value of form_data){
         //     console.log(value)
         // }
-        axios.post("https://api.bimbel-beta-smart.sanbercodeapp.com/peserta-didik", form_data, config)
-        .then(() => console.log("Selesai"))
+        axios.post("http://localhost:3000/peserta-didik", form_data, config)
+        .then((res) => console.log(res.data.data))
         .catch(err => console.log("Gagal"))
     }
 
@@ -95,6 +96,8 @@ export default function FormSiswa() {
                                         id="nama_siswa"
                                         className="p-2 w-full rounded-md border border-abu-bs"
                                         placeholder="cth: Bambang Anak Pak Budi"
+                                        onChange={(e) => setFormData({...formData, nama: e.target.value})}
+                                        value={formData.nama}
                                     />
                                 </div>
                             </div>
@@ -110,12 +113,16 @@ export default function FormSiswa() {
                                         id="nama_siswa"
                                         className="p-2 w-1/2 rounded-md border border-abu-bs"
                                         placeholder="cth: Medan"
+                                        onChange={(e) => setFormData({...formData, tempat: e.target.value})}
+                                        value={formData.tempat}
                                     />
                                     <input
                                         type="date"
                                         name="nama_siswa"
                                         id="nama_siswa"
                                         className="p-2 w-1/2 rounded-md border border-abu-bs"
+                                        placeholder="dd-mm-yyyy"
+                                        onChange={(e) => console.log(e.target.value)}
                                     />
                                 </div>
                             </div>
@@ -202,7 +209,7 @@ export default function FormSiswa() {
                                         name="foto_siswa"
                                         id="foto_siswa"
                                         className="p-2 w-full rounded-md border border-abu-bs"
-                                        onChange={(e) => setFormData({...formData, foto: e.target.files[0]})}
+                                        onChange={(e) => setFormData({...formData, fotoPeserta: e.target.files[0]})}
                                     />
                                 </div>
                             </div>

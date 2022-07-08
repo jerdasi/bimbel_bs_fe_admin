@@ -5,7 +5,7 @@ import Table from "./SmartComponent/Table";
 export default function TableSiswa() {
     const [user, setUser] = useState([]);
     useEffect(() => {
-        axios.get("https://api.bimbel-beta-smart.sanbercodeapp.com/peserta-didik").then((res) => {
+        axios.get("http://localhost:3000/peserta-didik").then((res) => {
             setUser([...res.data.data])
         });
         console.log("Use Effect Parent Jalan");
