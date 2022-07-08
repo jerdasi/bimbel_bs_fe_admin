@@ -44,7 +44,7 @@ export default function Table({ sumber = [], judulTabel = [] }) {
         } else {
             siswa = sumber.filter(
                 (item) =>
-                    item.name.toLowerCase().indexOf(value.toLowerCase()) !== -1
+                    item.nama.toLowerCase().indexOf(value.toLowerCase()) !== -1
             );
             setFiltered(
                 _(siswa)
@@ -109,23 +109,44 @@ export default function Table({ sumber = [], judulTabel = [] }) {
                     <tbody>
                         {filtered.map((item, index) => (
                             <tr
-                                key={index}
+                                key={item.id}
                                 className="h-10 border-y border-biru-bs hover:bg-biru-bs"
                             >
                                 <td className="text-center w-full px-8 md:w-[5%]">
                                     {index + 1 + (currentPage - 1) * pageSize}
                                 </td>
                                 <td className="w-full px-8 md:w-[20%]">
-                                    {item.name}
+                                    {item.nama}
                                 </td>
                                 <td className="w-full px-8 md:w-[20%]">
-                                    {item.username}
+                                    {`${item.tempat}/${item.tanggal_lahir}`}
                                 </td>
                                 <td className="w-full px-8 md:w-[20%]">
-                                    {item.email}
+                                    {item.asal_sekolah}
                                 </td>
                                 <td className="w-full px-8 md:w-[20%]">
-                                    {item.website}
+                                    {item.alamat}
+                                </td>
+                                <td className="w-full px-8 md:w-[20%]">
+                                    {item.foto}
+                                </td>
+                                <td className="w-full px-8 md:w-[20%]">
+                                    {item.nama_ayah}
+                                </td>
+                                <td className="w-full px-8 md:w-[20%]">
+                                    {item.nama_ibu}
+                                </td>
+                                <td className="w-full px-8 md:w-[20%]">
+                                    {item.telepon_anak}
+                                </td>
+                                <td className="w-full px-8 md:w-[20%]">
+                                    {item.telepon_ayah}
+                                </td>
+                                <td className="w-full px-8 md:w-[20%]">
+                                    {item.telepon_ibu}
+                                </td>
+                                <td className="w-full px-8 md:w-[20%]">
+                                    {item.id_grup? "Tidak Aktif" : "Aktif"}
                                 </td>
                                 <td className="w-[15%]">
                                     <div className="w-full h-full flex justify-center gap-3">

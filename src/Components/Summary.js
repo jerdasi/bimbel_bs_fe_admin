@@ -91,7 +91,7 @@ export default function Summary() {
                         <p className="text-sm">
                             5 Jenjang Pendidikan Terdaftar
                         </p>
-                        <div className="h-full flex flex-wrap gap-2 overflow-y-auto mt-3 overflow-hidden">
+                        <div className="h-full flex flex-wrap gap-2 overflow-y-auto mt-3 overflow-hidden hide-scrollbar">
                             <div className="jenjang-item w-[30%] h-[90%] border border-black rounded-md p-4 md:p-0 bg-biru-bs md:bg-white flex flex-col justify-between items-center text-center overflow-hidden">
                                 <div className="hidden md:block jenjang-img md:py-2 md:h-2/3">
                                     <img

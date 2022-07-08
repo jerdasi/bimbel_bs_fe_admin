@@ -1,12 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+// import { useEffect } from "react";
 
 export default function FormSiswa() {
     const [show, setShow] = useState(false);
+    const [jenjang, setJenjang] = useState([]);
+    const [formData, setFormData] = useState({
+        nama: "Anonyomous",
+        tempat: "Medan",
+        tanggal_lahir: new Date(),
+        alamat: "Mau Tau Aja",
+        asal_sekolah: "SMP Suka Jadi",
+        fotoPeserta: "",
+        nama_ayah: "Bambang",
+        nama_ibu: "Bwaa",
+        telepon_anak: "0",
+        telepon_ayah: "0",
+        telepon_ibu: "0",
+    })
 
     const handleShow = () => {
         setShow(!show);
         console.log(show);
     };
+
+    const tambahSiswa = (event) => {
+        event.preventDefault()
+        const config = {     
+            headers: { 'Content-Type': 'multipart/form-data' }
+        }
+        var form_data = new FormData();
+        for (let key in formData){
+            form_data.append(key, formData[key])
+        }
+        // // form_data.append("foto", formData.foto)
+        // for (const value of form_data){
+        //     console.log(value)
+        // }
+        axios.post("https://api.bimbel-beta-smart.sanbercodeapp.com/peserta-didik", form_data, config)
+        .then(() => console.log("Selesai"))
+        .catch(err => console.log("Gagal"))
+    }
+
+    useEffect(() => {
+        axios.get("https://api.bimbel-beta-smart.sanbercodeapp.com/jenjang-pendidikan").then((res) => {
+            setJenjang([...res.data.data])
+        });
+    }, [])
 
     return (
         <div className="">
@@ -127,19 +167,11 @@ export default function FormSiswa() {
                                             >
                                                 Pilih Salah Satu
                                             </option>
-                                            <option value="SD">
-                                                Sekolah Dasar - SD
-                                            </option>
-                                            <option value="SD">
-                                                Sekolah Menengah Pertama - SMP
-                                            </option>
-                                            <option value="SD">
-                                                Sekolah Menengah Dasar - SD
-                                            </option>
-                                            <option value="SD">
-                                                Belum Sekolah
-                                            </option>
-                                            <option value="SD">TK</option>
+                                            {jenjang.map(item => (
+                                                <option value={item.id}>
+                                                    {`${item.nama_jenjang} - ${item.akronim}`}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
@@ -170,6 +202,7 @@ export default function FormSiswa() {
                                         name="foto_siswa"
                                         id="foto_siswa"
                                         className="p-2 w-full rounded-md border border-abu-bs"
+                                        onChange={(e) => setFormData({...formData, foto: e.target.files[0]})}
                                     />
                                 </div>
                             </div>
@@ -237,7 +270,7 @@ export default function FormSiswa() {
                             </div>
                         </div>
                         <div className="footer-form w-full h-[10%] flex items-center justify-end bg-biru-bs p-4">
-                            <button className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white">
+                            <button className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white" onClick={tambahSiswa}>
                                 Simpan
                             </button>
                         </div>

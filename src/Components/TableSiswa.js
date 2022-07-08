@@ -5,8 +5,8 @@ import Table from "./SmartComponent/Table";
 export default function TableSiswa() {
     const [user, setUser] = useState([]);
     useEffect(() => {
-        axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
-            setUser([...res.data]);
+        axios.get("https://api.bimbel-beta-smart.sanbercodeapp.com/peserta-didik").then((res) => {
+            setUser([...res.data.data])
         });
         console.log("Use Effect Parent Jalan");
     }, []);
@@ -21,11 +21,18 @@ export default function TableSiswa() {
                     <Table
                         sumber={user}
                         judulTabel={[
-                            "ID",
-                            "Name",
-                            "Username",
-                            "Email",
-                            "Website",
+                            "No",
+                            "Nama",
+                            "Tempat / Tanggal Lahir",
+                            "Asal Sekolah",
+                            "Alamat",
+                            "Foto",
+                            "Nama Ayah",
+                            "Nama Ibu",
+                            "Telepon Anak",
+                            "Telepon Ayah",
+                            "Telepon Ibu",
+                            "Status"
                         ]}
                     />
                 </div>

@@ -23,3 +23,12 @@
     height: 100% !important;
     border: 1px solid black;
 }
+/* Hide Scrollbar */
+.hide-scrollbar{
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar{
+    display: none;
+}
