@@ -8,7 +8,7 @@ export default function KelolaSiswa() {
         <div className="w-full md:w-screen md:h-screen md:flex p-2 pb-16 md:p-0">
             <SideBar />
             <TableSiswa />
-            <FormSiswa />
+            {/* <FormSiswa /> */}
         </div>
     );
 }
