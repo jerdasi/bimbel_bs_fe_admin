@@ -32,7 +32,7 @@ export default function TabelPaket() {
         data = {},
         key = -1,
     }) => {
-        let endpoint = `http://localhost:3000/${url}${
+        let endpoint = `${process.env.REACT_APP_API}/${url}${
             key !== -1 ? `/${key}` : ""
         }`;
         let res, information;
@@ -220,6 +220,7 @@ export default function TabelPaket() {
                     <h1>Kelola Paket Belajar</h1>
                 </div>
                 <div className="h-full w-full overflow-auto flex flex-wrap gap-4">
+                    {/* Looping Section Jenjang */}
                     {jenjang.length === 0
                         ? "Tidak ada Paket Bimbingan"
                         : jenjang.map((item) => (
@@ -235,6 +236,11 @@ export default function TabelPaket() {
                                           <button
                                               className="h-full w-1/3 py-1 md:py-0 rounded-md border border-abu-bs hover:bg-abu-bs hover:border-black hover:text-white"
                                               onClick={() => {
+                                                  // Scroll Ke atas
+                                                  window.scrollTo({
+                                                      top: 0,
+                                                      behavior: "smooth",
+                                                  });
                                                   setFormPurpose("Simpan");
                                                   setShowPaket(!showPaket);
                                                   setPaketItem({
@@ -267,6 +273,7 @@ export default function TabelPaket() {
                                       </div>
                                   </div>
                                   <div className="h-[90%] w-full flex flex-col flex-wrap overflow-auto gap-4">
+                                      {/* Looping Section Paket dalam Jenjang */}
                                       {paketBimbingan.filter(
                                           (paket) =>
                                               paket.id_jenjang === item.id
@@ -300,6 +307,16 @@ export default function TabelPaket() {
                                                         </div>
 
                                                         <div className="min-h-1/5 w-full absolute top-0 left-0 p-2 flex justify-end gap-2">
+                                                            <button
+                                                                className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
+                                                                onClick={() =>
+                                                                    handleEditPaket(
+                                                                        hasil.id
+                                                                    )
+                                                                }
+                                                            >
+                                                                <i class="fa-solid fa-plus text-lg"></i>
+                                                            </button>
                                                             <button
                                                                 className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
                                                                 onClick={() =>

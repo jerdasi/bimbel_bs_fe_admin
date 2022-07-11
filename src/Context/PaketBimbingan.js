@@ -11,6 +11,7 @@ export const PaketProvider = (props) => {
     const [paketItem, setPaketItem] = useState({
         nama_paket: "",
         id_jenjang: 0,
+        jumlah_pertemuan: 0,
         deskripsi: "",
         harga: 0,
     });

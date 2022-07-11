@@ -73,7 +73,19 @@ export default function SideBar() {
                                 to="/peserta-didik"
                                 className="hidden md:inline"
                             >
-                                Peserta Didik
+                                Kelola Peserta Didik
+                            </Link>
+                        </li>
+                        <li
+                            className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
+                            onClick={() => handleNavigatePage(`/peserta-didik`)}
+                        >
+                            <i class="fas fa-person-chalkboard text-2xl md:text-lg md:mr-2"></i>
+                            <Link
+                                to="/peserta-didik"
+                                className="hidden md:inline"
+                            >
+                                Kelola Guru
                             </Link>
                         </li>
                         <li
@@ -114,6 +126,18 @@ export default function SideBar() {
                                 className="hidden md:inline"
                             >
                                 Kelola Paket Bimbingan
+                            </Link>
+                        </li>
+                        <li
+                            className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
+                            onClick={() => handleNavigatePage(`/kelola-paket`)}
+                        >
+                            <i class="fa-solid fa-calendar-days text-2xl md:text-lg md:mr-2"></i>
+                            <Link
+                                to="/kelola-paket"
+                                className="hidden md:inline"
+                            >
+                                Absensi Guru
                             </Link>
                         </li>
                     </ul>

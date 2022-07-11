@@ -18,6 +18,7 @@ export default function FormPaket(props) {
             setPaketItem({
                 nama_paket: "",
                 id_jenjang: 0,
+                jumlah_pertemuan: 0,
                 deskripsi: "",
                 harga: 0,
             });
@@ -28,9 +29,14 @@ export default function FormPaket(props) {
     // Fungsi untuk Tambah Jenjang
     const handleAddEditPaket = (event) => {
         event.preventDefault();
-        const { nama_paket, id_jenjang, harga } = paketItem;
+        const { nama_paket, id_jenjang, jumlah_pertemuan, harga } = paketItem;
 
-        if (nama_paket !== "" && id_jenjang !== 0 && harga !== 0) {
+        if (
+            nama_paket !== "" &&
+            id_jenjang !== 0 &&
+            jumlah_pertemuan != 0 &&
+            harga !== 0
+        ) {
             props.handleTambahEditPaket(paketItem);
             handleShow();
         } else {
@@ -64,6 +70,7 @@ export default function FormPaket(props) {
                             </div>
                         </div>
                         <div className="body-form h-[80%] overflow-scroll p-4">
+                            {/* Nama Paket Bimbingan */}
                             <div className="row mb-3">
                                 <div className="title mb-1">
                                     <p>Nama Paket</p>
@@ -86,6 +93,7 @@ export default function FormPaket(props) {
                                 </div>
                             </div>
 
+                            {/* Masuk Jenjang Pendidikan Apa */}
                             <div className="row mb-3">
                                 <div className="title mb-1">
                                     <p>Jenjang Pendidikan</p>
@@ -109,6 +117,32 @@ export default function FormPaket(props) {
                                             </option>
                                         ))}
                                     </select>
+                                </div>
+                            </div>
+
+                            {/* Jumlah Pertemuan Berapa */}
+                            <div className="row mb-3">
+                                <div className="title mb-1">
+                                    <p>Jumlah Pertemuan / Minggu</p>
+                                </div>
+                                <div className="input-field">
+                                    <input
+                                        type="number"
+                                        name="jumlah_pertemuan"
+                                        id="jumlah_pertemuan"
+                                        className="p-2 w-full rounded-md border border-abu-bs"
+                                        onChange={(e) =>
+                                            setPaketItem({
+                                                ...paketItem,
+                                                jumlah_pertemuan: parseInt(
+                                                    e.target.value
+                                                ),
+                                            })
+                                        }
+                                        value={parseInt(
+                                            paketItem.jumlah_pertemuan
+                                        )}
+                                    />
                                 </div>
                             </div>
 
