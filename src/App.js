@@ -11,6 +11,7 @@ import KelolaSiswa from "./Pages/KelolaSiswa";
 import KelolaPendaftaran from "./Pages/KelolaPendaftaran";
 import KelolaTestimoni from "./Pages/KelolaTestimoni";
 import KelolaPaket from "./Pages/KelolaPaket";
+import KelolaGuru from "./Pages/KelolaGuru";
 
 const App = () => {
     return (
@@ -24,6 +25,7 @@ const App = () => {
                         path="/peserta-didik"
                         element={<KelolaSiswa />}
                     />
+                    <Route exact path="/kelola-guru" element={<KelolaGuru />} />
                     <Route
                         exact
                         path="/kelola-pendaftaran"

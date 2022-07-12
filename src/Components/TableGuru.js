@@ -2,73 +2,65 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { DataGrid } from "@mui/x-data-grid";
 import PreviewPhoto from "./SmartComponent/PreviewPhoto";
-import FormSiswa from "./FormSiswa";
+import FormGuru from "./FormGuru";
 import moment from "moment";
 import Swal from "sweetalert2";
 
-export default function TableSiswa() {
-    const [peserta, setPeserta] = useState([]);
-    const [dataTabel, setDataTabel] = useState([]);
-    const [jenjang, setJenjang] = useState([]);
-    const [singlePeserta, setSinglePeserta] = useState({
+export default function TableGuru() {
+    const [guru, setGuru] = useState([]);
+    const [singleGuru, setSingleGuru] = useState({
         nama: "",
         tempat: "",
         tanggal_lahir: moment().format("DD-MM-YYYY"),
+        pendidikan_terakhir: "",
+        fotoGuru: null,
         alamat: "",
-        id_jenjang: 0,
-        asal_sekolah: "",
-        fotoPeserta: null,
-        nama_ayah: "",
-        nama_ibu: "",
-        telepon_anak: "",
-        telepon_ayah: "",
-        telepon_ibu: "",
+        telepon: "",
+        motivasi_mengajar: "",
     });
 
     const [showPhoto, setShowPhoto] = useState(false);
     const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
-        axios
-            .get(`${process.env.REACT_APP_API}/jenjang-pendidikan`)
-            .then((res) => setJenjang(res.data.data));
-        axios
-            .get(`${process.env.REACT_APP_API}/peserta-didik`)
-            .then((res) => setPeserta(res.data.data));
+        axios.get(`${process.env.REACT_APP_API}/guru`).then((res) => {
+            setGuru(res.data.data);
+            console.log(res.data);
+        });
     }, []);
 
     // handleTambahEditPeserta
     // Id 0 artinya post, selain itu edit/update
-    const handlePeserta = (pesertaBaru, id = 0) => {
+    const handleGuru = (pesertaBaru, id = 0) => {
         if (id == 0) {
-            setPeserta([...peserta, pesertaBaru]);
+            setGuru([...guru, pesertaBaru]);
         } else {
-            let hasil = peserta.findIndex((item) => item.id == id);
-            let tempPeserta = [...peserta];
+            let hasil = guru.findIndex((item) => item.id == id);
+            let tempPeserta = [...guru];
             tempPeserta[hasil] = pesertaBaru;
-            setPeserta([...tempPeserta]);
+            setGuru([...tempPeserta]);
         }
     };
 
     // handleUpdatePeserta
     // Cari dan kirim ke form
-    const updatePeserta = (id) => {
-        let peserta_update = peserta.find((el) => el.id == id);
+    const updateGuru = (id) => {
+        let guru_update = guru.find((el) => el.id == id);
         setShowForm(!showForm);
-        setSinglePeserta(peserta_update);
+        setSingleGuru(guru_update);
     };
 
-    const showFotoPeserta = (id) => {
-        let peserta_update = peserta.find((el) => el.id == id);
+    const showFotoGuru = (id) => {
+        let guru_update = guru.find((el) => el.id == id);
         setShowPhoto(!showPhoto);
-        setSinglePeserta(peserta_update);
+        setSingleGuru(guru_update);
     };
 
     // handleHapusPeserta
-    const hapusPeserta = (id) => {
+    const hapusGuru = (id) => {
         Swal.fire({
             title: "Apakah Kamu Yakin?",
-            text: "Kamu akan menghapus peserta didik ini!",
+            text: "Kamu akan menghapus guru ini!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -78,12 +70,10 @@ export default function TableSiswa() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete(`${process.env.REACT_APP_API}/peserta-didik/${id}`)
+                    .delete(`${process.env.REACT_APP_API}/guru/${id}`)
                     .then((res) =>
-                        setPeserta(
-                            peserta.filter(
-                                (item) => item.id != res.data.data.id
-                            )
+                        setGuru(
+                            guru.filter((item) => item.id != res.data.data.id)
                         )
                     );
             }
@@ -94,21 +84,16 @@ export default function TableSiswa() {
         return data.map((item, index) => {
             return {
                 id: index,
-                id_peserta: item.id,
+                id_guru: item.id,
                 Nama: item.nama,
                 "Tempat/TanggalLahir": `${item.tempat}/${moment(
                     item.tanggal_lahir
                 ).format("DD-MM-YYYY")}`,
-                Jenjang: item.id_jenjang,
-                "Asal Sekolah": item.asal_sekolah,
-                Alamat: item.alamat,
+                PendidikanTerakhir: item.pendidikan_terakhir,
                 Foto: item.foto,
-                "Nama Ayah": item.nama_ayah,
-                "Nama Ibu": item.nama_ibu,
-                "Telepon Anak": item.telepon_anak,
-                "Telepon Ayah": item.telepon_ayah,
-                "Telepon Ibu": item.telepon_ibu,
-                Status: item.id_grup ? "Aktif" : "Tidak Aktif",
+                Alamat: item.alamat,
+                Telepon: item.telepon,
+                MotivasiMengajar: item.motivasi_mengajar,
             };
         });
     };
@@ -121,17 +106,10 @@ export default function TableSiswa() {
             width: 200,
         },
         {
-            field: "Jenjang",
-            headerName: "Jenjang",
+            field: "PendidikanTerakhir",
+            headerName: "Pendidikan Terakhir",
             width: 70,
-            renderCell: (params) => {
-                return jenjang.filter((j) => j.id == params.value)[0][
-                    "akronim"
-                ];
-            },
         },
-        { field: "Asal Sekolah", headerName: "Asal Sekolah", width: 100 },
-        { field: "Alamat", headerName: "Alamat", width: 200 },
         {
             field: "Foto",
             headerName: "Foto",
@@ -142,7 +120,7 @@ export default function TableSiswa() {
                         <i
                             class="fa-solid fa-eye"
                             onClick={(e) => {
-                                showFotoPeserta(params.row.id_peserta);
+                                showFotoGuru(params.row.id_guru);
                             }}
                         ></i>{" "}
                         {`  ...${params.value}`}
@@ -150,12 +128,13 @@ export default function TableSiswa() {
                 );
             },
         },
-        { field: "Nama Ayah", headerName: "Nama Ayah", width: 150 },
-        { field: "Nama Ibu", headerName: "Nama Ibu", width: 150 },
-        { field: "Telepon Anak", headerName: "Telepon Anak", width: 150 },
-        { field: "Telepon Ayah", headerName: "Telepon Ayah", width: 150 },
-        { field: "Telepon Ibu", headerName: "Telepon Ibu", width: 150 },
-        { field: "Status", headerName: "Status", width: 100 },
+        { field: "Alamat", headerName: "Alamat", width: 200 },
+        { field: "Telepon", headerName: "Telepon", width: 150 },
+        {
+            field: "MotivasiMengajar",
+            headerName: "Motivasi Mengajar",
+            width: 200,
+        },
         {
             field: "Action",
             width: 100,
@@ -164,15 +143,13 @@ export default function TableSiswa() {
                     <div className="w-full h-fit flex justify-center gap-3">
                         <button
                             className="p-2 border border-black rounded-md w-fit"
-                            onClick={(e) =>
-                                updatePeserta(params.row.id_peserta)
-                            }
+                            onClick={(e) => updateGuru(params.row.id_guru)}
                         >
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                         <button
                             className="p-2 bg-merah-bs text-white rounded-md border border-merah-bs w-fit"
-                            onClick={(e) => hapusPeserta(params.row.id_peserta)}
+                            onClick={(e) => hapusGuru(params.row.id_guru)}
                         >
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -187,18 +164,18 @@ export default function TableSiswa() {
             <PreviewPhoto
                 stateChanger={setShowPhoto}
                 status={showPhoto}
-                src={singlePeserta.foto}
+                src={singleGuru.foto}
             />
             <div className="w-full h-full md:w-4/5 md:h-full md:p-4 flex flex-col">
                 <h1
                     className="text-3xl font-bold text-merah-bs h-16 border-b border-biru-bs mb-1 flex items-center"
-                    onClick={() => convertToDataTable(peserta)}
+                    onClick={() => convertToDataTable(guru)}
                 >
-                    Kelola Data Peserta Didik
+                    Kelola Data Guru
                 </h1>
                 <div className="w-full h-[75vh]">
                     <DataGrid
-                        rows={convertToDataTable(peserta)}
+                        rows={convertToDataTable(guru)}
                         columns={columns}
                         pageSize={10}
                         rowsPerPageOptions={[10]}
@@ -218,9 +195,9 @@ export default function TableSiswa() {
                     {/* <button onClick={() => setTes("Gan")}>Change</button> */}
                 </div>
             </div>
-            <FormSiswa
-                handlePeserta={handlePeserta}
-                siswa={singlePeserta}
+            <FormGuru
+                handleGuru={handleGuru}
+                guru={singleGuru}
                 show={showForm}
                 setShow={setShowForm}
             />
