@@ -7,6 +7,8 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
     const [filteredKelas, setFilteredKelas] = useState([]);
     // const [show, setShow] = useState(false);
     const [hari, setHari] = useState([]);
+    const [jam, setJam] = useState([]);
+    const [operasional, setOperasional] = useState([]);
     const [kelas, setKelas] = useState([]);
     const [formData, setFormData] = useState(guru);
 
@@ -70,6 +72,12 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API}/hari`).then((res) => {
             setHari([...res.data.data]);
+        });
+        axios.get(`${process.env.REACT_APP_API}/jam`).then((res) => {
+            setJam([...res.data.data]);
+        });
+        axios.get(`${process.env.REACT_APP_API}/hari-jam`).then((res) => {
+            setOperasional(res.data.data);
         });
         // axios.get(`${process.env.REACT_APP_API}/kelas`).then((res) => {
         //     setKelas([...res.data.data]);
@@ -317,7 +325,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
                                     </div>
                                 </div>
 
-                                <div className="input-field h-96 overflow-y-auto">
+                                <div className="input-field h-fit max-h-96 overflow-y-auto">
                                     <select
                                         name="hari_operasional"
                                         id="hari_operasional"
@@ -330,6 +338,33 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
                                             </option>
                                         ))}
                                     </select>
+                                    <input
+                                        type="checkbox"
+                                        name="all_option"
+                                        id="all_option"
+                                        className="mr-2"
+                                    />
+                                    Pilih Semua
+                                    <br />
+                                    {operasional.map((item) => (
+                                        <>
+                                            <input
+                                                type="checkbox"
+                                                value={item.id}
+                                                className="mr-2"
+                                            />
+                                            {`${
+                                                hari.find(
+                                                    (h) => h.id == item.id_hari
+                                                ).nama_hari
+                                            }, ${
+                                                jam.find(
+                                                    (j) => j.id == item.id_jam
+                                                ).nama_rentang
+                                            }`}
+                                            <br />
+                                        </>
+                                    ))}
                                 </div>
                             </div>
                         </div>
