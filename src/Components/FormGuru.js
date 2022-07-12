@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
+import { data } from "autoprefixer";
+import Swal from "sweetalert2";
 // import { useEffect } from "react";
 
-export default function FormGuru({ handleGuru, show, setShow, guru }) {
+export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
     const [filteredKelas, setFilteredKelas] = useState([]);
     // const [show, setShow] = useState(false);
     const [hari, setHari] = useState([]);
@@ -11,9 +13,12 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
     const [operasional, setOperasional] = useState([]);
     const [kelas, setKelas] = useState([]);
     const [formData, setFormData] = useState(guru);
+    const [pilihanOperasional, setPilihanOperasional] = useState([]);
+    const [filterHari, setFilterHari] = useState("all");
 
     const handleShow = () => {
-        setFormData({
+        console.log(show);
+        setGuru({
             nama: "",
             tempat: "",
             tanggal_lahir: moment().format("DD-MM-YYYY"),
@@ -24,6 +29,29 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
             motivasi_mengajar: "",
         });
         setShow(!show);
+        console.log(formData.id);
+        if (!guru.id) {
+            console.log("Baru");
+            // let pilihan = operasional.map((item) => {
+            //     return {
+            //         id: item.id,
+            //         id_hari: item.id_hari,
+            //         checked: false,
+            //     };
+            // });
+            // setPilihanOperasional(pilihan);
+        } else {
+            console.log("Edit");
+            // let pilihan = operasional.map((item) => {
+            //     return {
+            //         id: item.id,
+            //         id_hari: item.id_hari,
+            //         checked: true,
+            //     };
+            // });
+            // setPilihanOperasional(pilihan);
+        }
+        console.log(formData);
     };
 
     const tambahGuru = (event) => {
@@ -36,10 +64,41 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
         for (let key in formData) {
             form_data.append(key, formData[key]);
         }
+        let jadwal = pilihanOperasional
+            .map((item) => {
+                let data;
+                if (item.checked) {
+                    data = {
+                        id_hari_jam: item.id,
+                    };
+                }
+                return data;
+            })
+            .filter((notUndefined) => notUndefined !== undefined);
+        let jadwal_guru = {
+            id_guru: "",
+            jadwal,
+        };
+
         axios
             .post(`${process.env.REACT_APP_API}/guru`, form_data, config)
             .then((res) => {
                 handleGuru(res.data.data);
+                jadwal_guru.id_guru = res.data.data.id;
+                // console.log(jadwal_guru);
+                axios
+                    .post(
+                        `${process.env.REACT_APP_API}/waktu-guru`,
+                        jadwal_guru
+                    )
+                    .then((res) => {
+                        console.log(res.data);
+                        Swal.fire(
+                            "Berhasil",
+                            "Berhasil Menambah Guru dan Jadwal",
+                            "success"
+                        );
+                    });
                 setShow();
             })
             .catch((err) => console.log(err));
@@ -77,26 +136,86 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
             setJam([...res.data.data]);
         });
         axios.get(`${process.env.REACT_APP_API}/hari-jam`).then((res) => {
-            setOperasional(res.data.data);
+            setOperasional([...res.data.data]);
+            let pilihan = res.data.data.map((item) => {
+                return {
+                    id: item.id,
+                    id_hari: item.id_hari,
+                    checked: false,
+                };
+            });
+            setPilihanOperasional(pilihan);
         });
         // axios.get(`${process.env.REACT_APP_API}/kelas`).then((res) => {
         //     setKelas([...res.data.data]);
         //     setFilteredKelas([...res.data.data]);
         // });
         setFormData(guru);
-    }, [guru]);
 
-    const filterKelas = (id) => {
-        setFilteredKelas(
-            kelas.filter((item) => {
-                if (id !== "" || id !== undefined) {
-                    return item.id_jenjang == id;
-                } else {
-                    return item;
-                }
-            })
-        );
-    };
+        // Jika Edit Maka Akan Menampilkan Jadwal yang telah ada
+        if (guru.id) {
+            // console.log(pilihanOperasional.findIndex((item) => item.id == 60));
+            axios
+                .get(`${process.env.REACT_APP_API}/waktu-guru?guru=${guru.id}`)
+                .then((res) => {
+                    let hasil = res.data.data;
+                    let pilihan = operasional.map((item) => {
+                        return {
+                            id: item.id,
+                            id_hari: item.id_hari,
+                            checked: false,
+                        };
+                    });
+                    hasil.forEach((element) => {
+                        if (
+                            pilihan.findIndex(
+                                (item) => item.id == element.id_hari_jam
+                            ) != -1
+                        ) {
+                            pilihan[
+                                pilihan.findIndex(
+                                    (item) => item.id == element.id_hari_jam
+                                )
+                            ].checked = true;
+                        }
+                        // console.log(element.id_hari_jam);
+                    });
+                    console.log({ hasil: hasil });
+                    console.log({ pilihan: pilihan });
+                    console.log({ operasional: operasional });
+                    setPilihanOperasional(pilihan);
+                    // let pilihan = [...operasional];
+                    // pilihan = pilihan.map((item) => {
+                    //     return {
+                    //         id: item.id,
+                    //         id_hari: item.id_hari,
+                    //         checked: false,
+                    //     };
+                    // });
+                    // console.log({ pilihanLama: pilihan });
+                    // console.log(guru.id);
+                    // console.log(hasil);
+                    // // hasil.splice(0, 10);
+                    // // console.log(hasil);
+                    // hasil.forEach((element) => {
+                    //     if (
+                    //         pilihan.findIndex(
+                    //             (item) => item.id == element.id_hari_jam
+                    //         )
+                    //     ) {
+                    //         pilihan[
+                    //             pilihan.findIndex(
+                    //                 (item) => item.id == element.id_hari_jam
+                    //             )
+                    //         ].checked = true;
+                    //     }
+                    //     // console.log(element.id_hari_jam);
+                    // });
+                    // console.log({ pilihanBaru: pilihan });
+                    // setPilihanOperasional(pilihan);
+                });
+        }
+    }, [guru]);
 
     return (
         <div className="">
@@ -131,7 +250,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
                             </h1>
                             <div
                                 className="close-button text-xl absolute top-0 right-4 cursor-pointer font-bold"
-                                onClick={(e) => setShow(!show)}
+                                onClick={handleShow}
                             >
                                 X
                             </div>
@@ -318,11 +437,6 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
                                     <div className="title text-merah-bs font-bold">
                                         <p>Ketersediaan Mengajar</p>
                                     </div>
-                                    <div>
-                                        <button className="p-2 bg-merah-bs text-white rounded-md">
-                                            Tambah Jadwal
-                                        </button>
-                                    </div>
                                 </div>
 
                                 <div className="input-field h-fit max-h-96 overflow-y-auto">
@@ -330,6 +444,9 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
                                         name="hari_operasional"
                                         id="hari_operasional"
                                         className="p-2 w-full rounded-md border border-abu-bs"
+                                        onChange={(e) =>
+                                            setFilterHari(e.target.value)
+                                        }
                                     >
                                         <option value="all">Semua Hari</option>
                                         {hari.map((item) => (
@@ -343,28 +460,97 @@ export default function FormGuru({ handleGuru, show, setShow, guru }) {
                                         name="all_option"
                                         id="all_option"
                                         className="mr-2"
+                                        onChange={(e) => {
+                                            setPilihanOperasional(
+                                                pilihanOperasional.map(
+                                                    (item) => {
+                                                        item.checked =
+                                                            e.target.checked;
+                                                        return item;
+                                                    }
+                                                )
+                                            );
+                                        }}
                                     />
                                     Pilih Semua
                                     <br />
-                                    {operasional.map((item) => (
-                                        <>
-                                            <input
-                                                type="checkbox"
-                                                value={item.id}
-                                                className="mr-2"
-                                            />
-                                            {`${
-                                                hari.find(
-                                                    (h) => h.id == item.id_hari
-                                                ).nama_hari
-                                            }, ${
-                                                jam.find(
-                                                    (j) => j.id == item.id_jam
-                                                ).nama_rentang
-                                            }`}
-                                            <br />
-                                        </>
-                                    ))}
+                                    {pilihanOperasional.map((item, index) => {
+                                        if (filterHari != "all") {
+                                            if (item.id_hari == filterHari) {
+                                                return (
+                                                    <>
+                                                        <input
+                                                            type="checkbox"
+                                                            value={item.id}
+                                                            checked={
+                                                                item.checked
+                                                            }
+                                                            className="mr-2"
+                                                            onChange={(e) => {
+                                                                setPilihanOperasional(
+                                                                    pilihanOperasional.map(
+                                                                        (
+                                                                            pil
+                                                                        ) => {
+                                                                            if (
+                                                                                pil.id ==
+                                                                                item.id
+                                                                            ) {
+                                                                                pil.checked =
+                                                                                    e.target.checked;
+                                                                            }
+                                                                            return pil;
+                                                                        }
+                                                                    )
+                                                                );
+                                                            }}
+                                                        />
+                                                        {`${operasional[index].nama_hari}, ${operasional[index].nama_rentang}`}
+
+                                                        <br />
+                                                    </>
+                                                );
+                                            }
+                                        } else {
+                                            return (
+                                                <>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={item.id}
+                                                        checked={item.checked}
+                                                        className="mr-2"
+                                                        onChange={(e) => {
+                                                            setPilihanOperasional(
+                                                                pilihanOperasional.map(
+                                                                    (pil) => {
+                                                                        if (
+                                                                            pil.id ==
+                                                                            item.id
+                                                                        ) {
+                                                                            pil.checked =
+                                                                                e.target.checked;
+                                                                        }
+                                                                        return pil;
+                                                                    }
+                                                                )
+                                                            );
+                                                        }}
+                                                    />
+                                                    {`${operasional[index].nama_hari}, ${operasional[index].nama_rentang}`}
+                                                    {/* {`${
+                                                    hari.find(
+                                                        (h) => h.id == item.id_hari
+                                                    ).nama_hari
+                                                }, ${
+                                                    jam.find(
+                                                        (j) => j.id == item.id_jam
+                                                    ).nama_rentang
+                                                }`} */}
+                                                    <br />
+                                                </>
+                                            );
+                                        }
+                                    })}
                                 </div>
                             </div>
                         </div>

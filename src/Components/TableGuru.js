@@ -198,6 +198,7 @@ export default function TableGuru() {
             <FormGuru
                 handleGuru={handleGuru}
                 guru={singleGuru}
+                setGuru={setSingleGuru}
                 show={showForm}
                 setShow={setShowForm}
             />
