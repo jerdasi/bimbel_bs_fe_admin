@@ -1,229 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import axios from "axios";
 import moment from "moment";
-import { data } from "autoprefixer";
+import {data} from "autoprefixer";
 import Swal from "sweetalert2";
 // import { useEffect } from "react";
 
-export default function FormGrup() {
-    const [filteredKelas, setFilteredKelas] = useState([]);
-    // const [show, setShow] = useState(false);
+export default function FormGrup({showGroup, setShowGroup, idPaket, setIdPaket}) {
+    const [guru, setGuru] = useState([]);
+    const [paket, setPaket] = useState([]);
+    const [formData, setFormData] = useState({
+        nama_grup: "",
+        id_paket: 0,
+        id_grup: 0,
+        kuota: 0,
+    })
+
     const [hari, setHari] = useState([]);
     const [jam, setJam] = useState([]);
     const [operasional, setOperasional] = useState([]);
     const [kelas, setKelas] = useState([]);
-    const [formData, setFormData] = useState();
+    // const [formData, setFormData] = useState();
     const [pilihanOperasional, setPilihanOperasional] = useState([]);
     const [filterHari, setFilterHari] = useState("all");
 
-    // const handleShow = () => {
-    //     console.log(show);
-    //     // setGuru({
-    //     //     nama: "",
-    //     //     tempat: "",
-    //     //     tanggal_lahir: moment().format("DD-MM-YYYY"),
-    //     //     pendidikan_terakhir: "",
-    //     //     fotoGuru: null,
-    //     //     alamat: "",
-    //     //     telepon: "",
-    //     //     motivasi_mengajar: "",
-    //     // });
-    //     setShow(!show);
-    //     console.log(formData.id);
-    //     if (!guru.id) {
-    //         console.log("Baru");
-    //         // let pilihan = operasional.map((item) => {
-    //         //     return {
-    //         //         id: item.id,
-    //         //         id_hari: item.id_hari,
-    //         //         checked: false,
-    //         //     };
-    //         // });
-    //         // setPilihanOperasional(pilihan);
-    //     } else {
-    //         console.log("Edit");
-    //         // let pilihan = operasional.map((item) => {
-    //         //     return {
-    //         //         id: item.id,
-    //         //         id_hari: item.id_hari,
-    //         //         checked: true,
-    //         //     };
-    //         // });
-    //         // setPilihanOperasional(pilihan);
-    //     }
-    //     console.log(formData);
-    // };
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API}/guru`).then((res) => {
+            setGuru(res.data.data)
+        })
+        axios.get(`${process.env.REACT_APP_API}/paket-bimbingan`).then((res) => {
+            setPaket(res.data.data)
+        })
+        if(idPaket != 0){
+            setFormData({...formData, id_paket: idPaket})
+        }
+    }, [])
 
-    // const tambahGuru = (event) => {
-    //     event.preventDefault();
-    //     // delete formData["id_kelas"];
-    //     const config = {
-    //         headers: { "Content-Type": "multipart/form-data" },
-    //     };
-    //     let form_data = new FormData();
-    //     for (let key in formData) {
-    //         form_data.append(key, formData[key]);
-    //     }
-    //     let jadwal = pilihanOperasional
-    //         .map((item) => {
-    //             let data;
-    //             if (item.checked) {
-    //                 data = {
-    //                     id_hari_jam: item.id,
-    //                 };
-    //             }
-    //             return data;
-    //         })
-    //         .filter((notUndefined) => notUndefined !== undefined);
-    //     let jadwal_guru = {
-    //         id_guru: "",
-    //         jadwal,
-    //     };
+    const handleShow = () => {
+        setIdPaket(0)
+        setShowGroup(!showGroup)
+    }
 
-    //     axios
-    //         .post(`${process.env.REACT_APP_API}/guru`, form_data, config)
-    //         .then((res) => {
-    //             handleGuru(res.data.data);
-    //             jadwal_guru.id_guru = res.data.data.id;
-    //             // console.log(jadwal_guru);
-    //             axios
-    //                 .post(
-    //                     `${process.env.REACT_APP_API}/waktu-guru`,
-    //                     jadwal_guru
-    //                 )
-    //                 .then((res) => {
-    //                     console.log(res.data);
-    //                     Swal.fire(
-    //                         "Berhasil",
-    //                         "Berhasil Menambah Guru dan Jadwal",
-    //                         "success"
-    //                     );
-    //                 });
-    //             setShow();
-    //         })
-    //         .catch((err) => console.log(err));
-    // };
-
-    // const editGuru = (event) => {
-    //     event.preventDefault();
-    //     // delete formData["id_kelas"];
-    //     const config = {
-    //         headers: { "Content-Type": "multipart/form-data" },
-    //     };
-    //     let form_data = new FormData();
-    //     for (let key in formData) {
-    //         form_data.append(key, formData[key]);
-    //     }
-    //     axios
-    //         .put(
-    //             `${process.env.REACT_APP_API}/guru/${formData.id}`,
-    //             form_data,
-    //             config
-    //         )
-    //         .then((res) => {
-    //             handleGuru(res.data.data, formData.id);
-    //             handleShow();
-    //         });
-    //     // handlePeserta("Tes", 35);
-    // };
-
-    // Use Effect
-    // useEffect(() => {
-    // axios.get(`${process.env.REACT_APP_API}/hari`).then((res) => {
-    //     setHari([...res.data.data]);
-    // });
-    // axios.get(`${process.env.REACT_APP_API}/jam`).then((res) => {
-    //     setJam([...res.data.data]);
-    // });
-    // axios.get(`${process.env.REACT_APP_API}/hari-jam`).then((res) => {
-    //     setOperasional([...res.data.data]);
-    //     let pilihan = res.data.data.map((item) => {
-    //         return {
-    //             id: item.id,
-    //             id_hari: item.id_hari,
-    //             checked: false,
-    //         };
-    //     });
-    //     setPilihanOperasional(pilihan);
-    // });
-    // axios.get(`${process.env.REACT_APP_API}/kelas`).then((res) => {
-    //     setKelas([...res.data.data]);
-    //     setFilteredKelas([...res.data.data]);
-    // });
-    // setFormData(guru);
-
-    // Jika Edit Maka Akan Menampilkan Jadwal yang telah ada
-    // if (guru.id) {
-    //     // console.log(pilihanOperasional.findIndex((item) => item.id == 60));
-    //     axios
-    //         .get(`${process.env.REACT_APP_API}/waktu-guru?guru=${guru.id}`)
-    //         .then((res) => {
-    //             let hasil = res.data.data;
-    //             let pilihan = operasional.map((item) => {
-    //                 return {
-    //                     id: item.id,
-    //                     id_hari: item.id_hari,
-    //                     checked: false,
-    //                 };
-    //             });
-    //             hasil.forEach((element) => {
-    //                 if (
-    //                     pilihan.findIndex(
-    //                         (item) => item.id == element.id_hari_jam
-    //                     ) != -1
-    //                 ) {
-    //                     pilihan[
-    //                         pilihan.findIndex(
-    //                             (item) => item.id == element.id_hari_jam
-    //                         )
-    //                     ].checked = true;
-    //                 }
-    //                 // console.log(element.id_hari_jam);
-    //             });
-    //             console.log({ hasil: hasil });
-    //             console.log({ pilihan: pilihan });
-    //             console.log({ operasional: operasional });
-    //             setPilihanOperasional(pilihan);
-    //             // let pilihan = [...operasional];
-    //             // pilihan = pilihan.map((item) => {
-    //             //     return {
-    //             //         id: item.id,
-    //             //         id_hari: item.id_hari,
-    //             //         checked: false,
-    //             //     };
-    //             // });
-    //             // console.log({ pilihanLama: pilihan });
-    //             // console.log(guru.id);
-    //             // console.log(hasil);
-    //             // // hasil.splice(0, 10);
-    //             // // console.log(hasil);
-    //             // hasil.forEach((element) => {
-    //             //     if (
-    //             //         pilihan.findIndex(
-    //             //             (item) => item.id == element.id_hari_jam
-    //             //         )
-    //             //     ) {
-    //             //         pilihan[
-    //             //             pilihan.findIndex(
-    //             //                 (item) => item.id == element.id_hari_jam
-    //             //             )
-    //             //         ].checked = true;
-    //             //     }
-    //             //     // console.log(element.id_hari_jam);
-    //             // });
-    //             // console.log({ pilihanBaru: pilihan });
-    //             // setPilihanOperasional(pilihan);
-    //         });
-    // }
-    // }, [guru]);
-
-    return (
+        return (
         <div className="">
             {/* Form Data Siswa */}
             <div
                 className={[
                     "background w-screen h-screen bg-black bg-opacity-70 flex justify-center items-center top-0 left-0 z-50 absolute",
-                    // show ? "absolute" : "hidden",
+                    showGroup ? "absolute" : "hidden",
                 ].join(" ")}
             >
                 <div className="w-5/6 md:w-1/2 box-form h-3/4 overlow-auto">
@@ -238,7 +61,7 @@ export default function FormGrup() {
                             </h1>
                             <div
                                 className="close-button text-xl absolute top-0 right-4 cursor-pointer font-bold"
-                                // onClick={handleShow}
+                                onClick={handleShow}
                             >
                                 X
                             </div>
@@ -280,17 +103,17 @@ export default function FormGrup() {
                                 <div className="input-field">
                                     <input
                                         type="text"
-                                        name="nama_siswa"
-                                        id="nama_siswa"
+                                        name="nama_grup"
+                                        id="nama_grup"
                                         className="p-2 w-full rounded-md border border-abu-bs"
                                         placeholder="cth: Grup A"
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                nama: e.target.value,
+                                                nama_grup: e.target.value,
                                             })
                                         }
-                                        // value={formData.nama}
+                                        value={formData.nama_grup}
                                     />
                                 </div>
                             </div>
@@ -306,43 +129,44 @@ export default function FormGrup() {
                                             id="hari_operasional"
                                             className="p-2 w-full rounded-md border border-abu-bs"
                                             onChange={(e) =>
-                                                setFilterHari(e.target.value)
+                                                setFormData({...formData, id_paket: parseInt(e.target.value)})
                                             }
                                         >
                                             <option value="all" disabled>
                                                 Pilih Salah Satu
                                             </option>
-                                            {hari.map((item) => (
-                                                <option value={item.id}>
-                                                    {item.nama_hari}
-                                                </option>
-                                            ))}
+                                            {paket.map((item) => {
+                                                return (
+                                                    <option value={item.id} selected={item.id == idPaket? true: false}>
+                                                        {item.nama_paket}
+                                                    </option>
+                                                )
+                                            })}
                                         </select>
                                     </div>
                                 </div>
-                                <div className="row mb-3 w-1/2">
-                                    <div className="title mb-1">
-                                        <p>Guru</p>
-                                    </div>
-                                    <div className="input-field flex gap-2">
-                                        <select
-                                            name="hari_operasional"
-                                            id="hari_operasional"
-                                            className="p-2 w-full rounded-md border border-abu-bs"
-                                            onChange={(e) =>
-                                                setFilterHari(e.target.value)
-                                            }
-                                        >
-                                            <option value="all" disabled>
-                                                Pilih Salah Satu
-                                            </option>
-                                            {hari.map((item) => (
-                                                <option value={item.id}>
-                                                    {item.nama_hari}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+                            </div>
+                            <div className="row mb-3 w-full">
+                                <div className="title mb-1">
+                                    <p>Guru</p>
+                                </div>
+                                <div className="w-full h-48 flex flex-col flex-wrap gap-4 overflow-x-auto hide-scrollbar">
+                                    {guru.map(item => (
+                                        <div className="h-full w-48 border border-black relative rounded-md">
+                                            <img src={`${process.env.REACT_APP_API}/${item.foto}`} alt="" className="h-full w-full object-cover hover:object-contain"/>
+                                            <div className="absolute bottom-0 left-0 w-full">
+                                                <h1 className="font-bold">{item.nama}</h1>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {guru.map(item => (
+                                        <div className="h-full w-48 border border-black relative rounded-md">
+                                            <img src={`${process.env.REACT_APP_API}/${item.foto}`} alt="" className="h-full w-full object-cover hover:object-contain"/>
+                                            <div className="absolute bottom-4 left-4 w-full">
+                                                <h1 className="font-bold">{item.nama}</h1>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
@@ -403,7 +227,8 @@ export default function FormGrup() {
                                             </option>
                                         ))}
                                     </select>
-                                    <button className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
+                                    <button
+                                        className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
                                         Set
                                     </button>
                                 </div>
@@ -438,7 +263,8 @@ export default function FormGrup() {
                                             </option>
                                         ))}
                                     </select>
-                                    <button className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
+                                    <button
+                                        className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
                                         Set
                                     </button>
                                 </div>
@@ -473,7 +299,8 @@ export default function FormGrup() {
                                             </option>
                                         ))}
                                     </select>
-                                    <button className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
+                                    <button
+                                        className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
                                         Set
                                     </button>
                                 </div>
@@ -508,7 +335,8 @@ export default function FormGrup() {
                                             </option>
                                         ))}
                                     </select>
-                                    <button className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
+                                    <button
+                                        className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
                                         Set
                                     </button>
                                 </div>
@@ -543,7 +371,8 @@ export default function FormGrup() {
                                             </option>
                                         ))}
                                     </select>
-                                    <button className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
+                                    <button
+                                        className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white">
                                         Set
                                     </button>
                                 </div>
