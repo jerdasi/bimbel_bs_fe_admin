@@ -38,9 +38,9 @@ export default function FormJenjang(props) {
 
     return (
         <div className="">
-            <div className="w-1/2 md:w-1/6 inline fixed bottom-20 md:bottom-10 right-4 md:right-10 flex justify-end">
+            <div className="w-1/2 md:w-1/6 inline fixed bottom-20 md:bottom-10 right-4 md:right-10 flex justify-end drop-shadow-lg">
                 <button
-                    className="w-5/6 bg-merah-bs text-white rounded-lg text-lg flex items-center justify-center p-2"
+                    className="w-5/6 bg-merah-bs text-white rounded-lg text-lg flex items-center justify-center p-2 border border-white"
                     onClick={() => {
                         setFormPurpose("Simpan");
                         handleShow();

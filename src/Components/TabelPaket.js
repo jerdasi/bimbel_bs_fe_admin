@@ -4,6 +4,7 @@ import FormJenjang from "./FormJenjang";
 import Swal from "sweetalert2";
 import { PaketContext } from "../Context/PaketBimbingan";
 import FormPaket from "./FormPaket";
+import FormGrup from "./FormGrup";
 
 export default function TabelPaket() {
     const {
@@ -225,7 +226,7 @@ export default function TabelPaket() {
                         ? "Tidak ada Paket Bimbingan"
                         : jenjang.map((item) => (
                               <div
-                                  className="w-full h-[35vh] flex flex-col my-4"
+                                  className="w-full h-[40vh] flex flex-col my-4"
                                   key={item.id}
                               >
                                   <div className="w-full md:h-[10%] flex flex-col md:flex-row items-start md:items-center mb-2">
@@ -272,6 +273,7 @@ export default function TabelPaket() {
                                           </button>
                                       </div>
                                   </div>
+
                                   <div className="h-[90%] w-full flex flex-col flex-wrap overflow-auto gap-4">
                                       {/* Looping Section Paket dalam Jenjang */}
                                       {paketBimbingan.filter(
@@ -294,16 +296,23 @@ export default function TabelPaket() {
                                                                 className="h-full object-cover group-hover:blur-sm"
                                                             />
                                                         </div>
-                                                        <div className="min-h-1/5 w-full absolute bottom-0 left-0 p-2">
-                                                            <h1 className="font-bold text-lg w-fit bg-merah-bs rounded-md text-white px-2">
-                                                                {
-                                                                    hasil.nama_paket
-                                                                }
-                                                            </h1>
-                                                            <p className="hidden group-hover:block">
-                                                                Rp.{" "}
-                                                                {hasil.harga}
-                                                            </p>
+                                                        <div className="min-h-1/5 w-full absolute bottom-0 left-0 p-2 flex items-center">
+                                                            <div className="description w-11/12">
+                                                                <h1 className="font-bold text-lg w-fit bg-merah-bs rounded-md text-white px-2">
+                                                                    {
+                                                                        hasil.nama_paket
+                                                                    }
+                                                                </h1>
+                                                                <p className="hidden group-hover:block">
+                                                                    Rp.{" "}
+                                                                    {
+                                                                        hasil.harga
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                            <div className="detail w-1/12 p-2 border rounded-r-md bg-merah-bs text-white">
+                                                                <i className="fa-solid fa-chevron-right"></i>
+                                                            </div>
                                                         </div>
 
                                                         <div className="min-h-1/5 w-full absolute top-0 left-0 p-2 flex justify-end gap-2">
@@ -316,6 +325,9 @@ export default function TabelPaket() {
                                                                 }
                                                             >
                                                                 <i class="fa-solid fa-plus text-lg"></i>
+                                                                <span className="hidden ">
+                                                                    Tambah Grup
+                                                                </span>
                                                             </button>
                                                             <button
                                                                 className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
@@ -347,6 +359,7 @@ export default function TabelPaket() {
             </div>
             <FormJenjang handleTambahEditJenjang={handleTambahEditJenjang} />
             <FormPaket handleTambahEditPaket={handleTambahEditPaket} />
+            <FormGrup />
         </>
     );
 }
