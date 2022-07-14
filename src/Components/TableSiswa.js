@@ -125,9 +125,12 @@ export default function TableSiswa() {
             headerName: "Jenjang",
             width: 70,
             renderCell: (params) => {
-                return jenjang.filter((j) => j.id == params.value)[0][
-                    "akronim"
-                ];
+                console.log({ Jenjang: params.row.Jenjang });
+                return jenjang.filter((j) => j.id == params.row.Jenjang)
+                    .akronim;
+                // return jenjang.filter((j) => j.id == params.row.jenjang)[0][
+                //     "akronim"
+                // ];
             },
         },
         { field: "Asal Sekolah", headerName: "Asal Sekolah", width: 100 },

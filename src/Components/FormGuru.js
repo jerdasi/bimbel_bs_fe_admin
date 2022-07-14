@@ -55,6 +55,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
     };
 
     const tambahGuru = (event) => {
+        console.log("Jalan");
         event.preventDefault();
         // delete formData["id_kelas"];
         const config = {
@@ -79,13 +80,15 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
             id_guru: "",
             jadwal,
         };
+        // let id_guru;
 
         axios
             .post(`${process.env.REACT_APP_API}/guru`, form_data, config)
             .then((res) => {
                 handleGuru(res.data.data);
+                console.log(res.data.data);
                 jadwal_guru.id_guru = res.data.data.id;
-                // console.log(jadwal_guru);
+
                 axios
                     .post(
                         `${process.env.REACT_APP_API}/waktu-guru`,
@@ -98,8 +101,9 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                             "Berhasil Menambah Guru dan Jadwal",
                             "success"
                         );
-                    });
-                setShow();
+                        setShow();
+                    })
+                    .catch((err) => console.log(err));
             })
             .catch((err) => console.log(err));
     };

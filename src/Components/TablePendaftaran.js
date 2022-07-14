@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "./SmartComponent/Table";
+import FormPendaftaran from "./FormPendaftaran";
+import { DataGrid } from "@mui/x-data-grid";
 
 export default function TablePendaftaran() {
-    const [user, setUser] = useState([]);
+    const [dataPendaftaran, setDataPendaftaran] = useState([]);
+    const [pendaftar, setPendaftar] = useState({});
+
     useEffect(() => {
         axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
             setUser([...res.data]);
@@ -47,18 +51,23 @@ export default function TablePendaftaran() {
                         </button>
                     </div>
                 </div>
-                <div className="h-full md:h-full overflow-auto">
-                    <Table
-                        sumber={user}
-                        judulTabel={[
-                            "No",
-                            "Nama Siswa",
-                            "Nama Paket",
-                            "Tanggal Pendaftaran",
-                            "Total Pembayaran",
-                        ]}
+                <div className="w-full h-[75vh]">
+                    <DataGrid
+                        rows={rows}
+                        columns={colums}
+                        pageSize={10}
+                        rowsPerPageOptions={[10]}
+                        checkboxSelection={false}
+                        pagination
+                        sx={{
+                            border: "none",
+                            "& .MuiDataGrid-columnHeaderTitle": {
+                                fontWeight: "bold",
+                            },
+                        }}
                     />
                 </div>
+                <FormPendaftaran />
             </div>
         </>
     );
