@@ -42,7 +42,7 @@ export default function SideBar() {
                 <h1 className="font-bold text-3xl">Beta Smart</h1>
             </div>
 
-            <div className="w-full h-full md:mt-8 list-menu flex md:flex-col justify-center md:justify-start md:gap-4 md:overflow-y-auto">
+            <div className="w-full h-full md:mt-8 list-menu flex md:flex-col justify-center md:justify-start md:gap-4 md:overflow-y-auto hide-scrollbar">
                 <div className="sub-menu flex md:block items-center">
                     <h3 className="hidden md:block font-light opacity-50">
                         Home
@@ -126,6 +126,18 @@ export default function SideBar() {
                                 className="hidden md:inline"
                             >
                                 Kelola Paket Bimbingan
+                            </Link>
+                        </li>
+                        <li
+                            className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
+                            onClick={() => handleNavigatePage(`/kelola-paket`)}
+                        >
+                            <i className="fa-solid fa-calendar-days text-2xl md:text-lg md:mr-2"></i>
+                            <Link
+                                to="/kelola-paket"
+                                className="hidden md:inline"
+                            >
+                                Absensi
                             </Link>
                         </li>
                     </ul>
