@@ -2,8 +2,9 @@ import axios from "axios";
 import moment from "moment";
 import React, { useState } from "react";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
 
-export default function FormPendaftaran() {
+export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
     const [show, setShow] = useState(false);
     const [siswa, setSiswa] = useState([]);
     const [paket, setPaket] = useState([]);
@@ -101,8 +102,26 @@ export default function FormPendaftaran() {
         }
     }, [formPendaftaran.id_guru, formPendaftaran.id_paket]);
 
+    const daftarPeserta = (event) => {
+        event.preventDefault()
+        let requestForm = {...formValue, tanggal_pendaftaran: moment(new Date()).format("yyyy-MM-DD")}
+        // console.log(moment(new Date()).format("yyyy-MM-DD"))
+        // console.log({Reguler: formValue})
+
+        if(jenisPaket.kuota != null){
+            //Buat Grup
+            //Daftar
+        }
+
+        //Ini Jika Ga buat Grup Baru
+        axios.post(`${process.env.REACT_APP_API}/pendaftaran`, requestForm)
+            .then((res) => {
+                setDataPendaftaran([...dataPendaftaran, res.data.data]);
+                Swal.fire("Berhasil", "Berhasil Mendaftarkan Peserta Didik Baru", "success")
+            })
+    }
+
     const fixJadwal = (toSet) => {
-        // console.log(toSet.id_hari, toSet.id_jam);
         console.log(
             jadwalGuru.filter(
                 (item) =>
@@ -276,6 +295,8 @@ export default function FormPendaftaran() {
                                                     id_jenjang: parseInt(
                                                         e.target.value
                                                     ),
+                                                    id_paket: 0,
+                                                    id_grup: 0
                                                 })
                                             }
                                         >
@@ -305,13 +326,15 @@ export default function FormPendaftaran() {
                                                     : false
                                             }
                                             className="p-2 border border-abu-bs w-full rounded-md"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setFormPendaftaran({
                                                     ...formPendaftaran,
                                                     id_paket: parseInt(
                                                         e.target.value
-                                                    ),
+                                                    )
                                                 })
+                                                setFormValue({...formValue, id_grup: -1})
+                                            }
                                             }
                                             value={formPendaftaran.id_paket}
                                         >
@@ -347,6 +370,21 @@ export default function FormPendaftaran() {
                                                     ? true
                                                     : false
                                             }
+                                            onChange={(e) =>
+                                                setFormValue({
+                                                    ...formValue,
+                                                    id_grup: parseInt(
+                                                        e.target.value
+                                                    ),
+                                                    total_pembayaran: paket.filter(
+                                                        (item) =>
+                                                            item.id ==
+                                                            formPendaftaran.id_paket
+                                                    )[0]?.harga
+
+                                                })
+                                            }
+                                            value={formValue.id_grup}
                                         >
                                             <option
                                                 value="none"
@@ -566,7 +604,7 @@ export default function FormPendaftaran() {
                             </div>
                         </div>
                         <div className="footer-form w-full h-[10%] flex items-center justify-end bg-biru-bs p-4">
-                            <button className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white">
+                            <button className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white" onClick={(e) => daftarPeserta(e)}>
                                 Simpan
                             </button>
                         </div>

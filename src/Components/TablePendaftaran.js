@@ -115,7 +115,6 @@ export default function TablePendaftaran() {
             };
         });
     };
-    const rows = [];
 
     return (
         <>
@@ -169,7 +168,7 @@ export default function TablePendaftaran() {
                         }}
                     />
                 </div>
-                <FormPendaftaran />
+                <FormPendaftaran setDataPendaftaran={setDataPendaftaran} dataPendaftaran={dataPendaftaran}/>
             </div>
         </>
     );
