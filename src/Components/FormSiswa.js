@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
 // import { useEffect } from "react";
 
 export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
@@ -46,7 +47,8 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
             )
             .then((res) => {
                 handlePeserta(res.data.data);
-                setShow();
+                handleShow();
+                Swal.fire("Berhasil","Berhasil Menamabah Peserta Didik Baru","success")
             })
             .catch((err) => console.log(err));
     };
@@ -70,6 +72,7 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
             .then((res) => {
                 handlePeserta(res.data.data, formData.id);
                 handleShow();
+                Swal.fire("Berhasil","Berhasil Mengubah Informasi Peserta Didik","success")
             });
         // handlePeserta("Tes", 35);
     };

@@ -45,14 +45,14 @@ export default function TableTestimoni() {
 
     // handleTambahEditPeserta
     // Id 0 artinya post, selain itu edit/update
-    const handleTestimoni = (pesertaBaru, id = 0) => {
+    const handleTestimoni = (testimoniBaru, id = 0) => {
         if (id == 0) {
-            setGuru([...guru, pesertaBaru]);
+            setTestimoni([...testimoni, testimoniBaru]);
         } else {
-            let hasil = guru.findIndex((item) => item.id == id);
-            let tempPeserta = [...guru];
-            tempPeserta[hasil] = pesertaBaru;
-            setGuru([...tempPeserta]);
+            let hasil = testimoni.findIndex((item) => item.id == id);
+            let tempTestimoni = [...guru];
+            tempTestimoni[hasil] = testimoniBaru;
+            setGuru([...tempTestimoni]);
         }
     };
 
@@ -184,7 +184,7 @@ export default function TableTestimoni() {
                     />
                 </div>
             </div>
-            <FormTestimoni setShowForm={setShowForm} showForm={showForm} />
+            <FormTestimoni handleTestimoni={handleTestimoni} setShowForm={setShowForm} showForm={showForm} testimoni={testimoni} setTestimoni={setTestimoni}/>
         </>
     );
 }

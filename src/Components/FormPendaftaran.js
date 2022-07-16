@@ -1,7 +1,7 @@
 import axios from "axios";
 import moment from "moment";
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, {useState} from "react";
+import {useEffect} from "react";
 import Swal from "sweetalert2";
 
 export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
@@ -24,7 +24,7 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
     const [formValue, setFormValue] = useState({
         id_siswa: -1,
         id_grup: -1,
-        tanggal_pendaftaran: moment(),
+        tanggal_pendaftaran: new Date(),
         total_pembayaran: 0,
         status: "pending",
     });
@@ -71,7 +71,7 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                     setJadwal(
                         [...Array(res.data.data.jumlah_pertemuan)].map(
                             (item) => {
-                                return { id_hari: 0, id_jam: 0 };
+                                return {id_hari: 0, id_jam: 0};
                             }
                         )
                     );
@@ -104,11 +104,10 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
 
     const daftarPeserta = (event) => {
         event.preventDefault()
-        let requestForm = {...formValue, tanggal_pendaftaran: moment(new Date()).format("yyyy-MM-DD")}
-        // console.log(moment(new Date()).format("yyyy-MM-DD"))
-        // console.log({Reguler: formValue})
+        let requestForm = {...formValue, tanggal_pendaftaran: new Date(), id_grup: parseInt(formValue.id_grup)}
+        console.log(requestForm)
 
-        if(jenisPaket.kuota != null){
+        if (jenisPaket.kuota != null) {
             //Buat Grup
             //Daftar
         }
@@ -116,8 +115,16 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
         //Ini Jika Ga buat Grup Baru
         axios.post(`${process.env.REACT_APP_API}/pendaftaran`, requestForm)
             .then((res) => {
-                setDataPendaftaran([...dataPendaftaran, res.data.data]);
-                Swal.fire("Berhasil", "Berhasil Mendaftarkan Peserta Didik Baru", "success")
+                console.log(res.data.data.id)
+                //Manggil Secara Manual Biar Data nya Penuh
+                axios.get(`${process.env.REACT_APP_API}/pendaftaran/${res.data.data.id}`)
+                    .then(has => {
+                        setDataPendaftaran([...dataPendaftaran, ...has.data.data])
+                        Swal.fire("Berhasil", "Berhasil Mendaftarkan Peserta Didik Baru", "success")
+                    })
+
+                handleShow();
+
             })
     }
 
@@ -160,8 +167,17 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
 
     const handleShow = () => {
         setShow(!show);
-        console.log(show);
     };
+
+    //Function Filter Paket Berdasarkan Jenjang
+    const filterPaket = (key) => {
+        return paket.filter(item => item.id_jenjang == parseInt(key))
+    }
+
+    //Function Filter Grup Berdasarkan Paket
+    const filterGrup = (key) => {
+        return grup.filter(item => item.id_paket == formPendaftaran.id_paket)
+    }
 
     return (
         <div className="">
@@ -221,7 +237,8 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                         }}
                                         value={formPendaftaran.nama_siswa}
                                     />
-                                    <div className="absolute bottom-0 right-0 w-8 h-full flex items-center cursor-pointer">
+                                    <div
+                                        className="absolute bottom-0 right-0 w-8 h-full flex items-center cursor-pointer">
                                         {formValue.id_siswa == -1 && (
                                             <i class="fa-solid fa-magnifying-glass"></i>
                                         )}
@@ -243,7 +260,8 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                         )}
                                     </div>
                                 </div>
-                                <div className="result-search w-full h-48 border-x border-b border-abu-bs rounded-md p-2 pt-0 overflow-auto">
+                                <div
+                                    className="result-search w-full h-48 border-x border-b border-abu-bs rounded-md p-2 pt-0 overflow-auto">
                                     <h1 className="font-semibold sticky top-0 left-0 backdrop-blur-sm py-2 bg-white/30">
                                         Nama Siswa
                                     </h1>
@@ -256,7 +274,8 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                                         setFormPendaftaran({
                                                             ...formPendaftaran,
                                                             nama_siswa:
-                                                                item.nama,
+                                                            item.nama,
+                                                            id_jenjang: item.id_jenjang
                                                         });
                                                         setFormValue({
                                                             ...formValue,
@@ -303,11 +322,12 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                             <option value={0} disabled>
                                                 Pilih Salah Satu
                                             </option>
-                                            {jenjang.map((item) => (
-                                                <option value={item.id}>
-                                                    {item.nama_jenjang}
-                                                </option>
-                                            ))}
+                                            {jenjang.length ?
+                                                jenjang.map((item) => (
+                                                    <option value={item.id}>
+                                                        {item.nama_jenjang}
+                                                    </option>
+                                                )) : (<p>Tidak Tersedia</p>)}
                                         </select>
                                     </div>
                                 </div>
@@ -339,19 +359,13 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                             value={formPendaftaran.id_paket}
                                         >
                                             <option value={0} selected disabled>
-                                                Pilih Salah Satu
+                                                {filterPaket(formPendaftaran.id_jenjang).length ? "Pilih Salah Satu" : "Tidak Tersedia"}
                                             </option>
-                                            {paket
-                                                .filter(
-                                                    (item) =>
-                                                        item.id_jenjang ==
-                                                        formPendaftaran.id_jenjang
-                                                )
-                                                .map((item) => (
-                                                    <option value={item.id}>
-                                                        {item.nama_paket}
-                                                    </option>
-                                                ))}
+                                            {filterPaket(formPendaftaran.id_jenjang).map(item => (
+                                                <option value={item.id}>
+                                                    {item.nama_paket}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
@@ -370,7 +384,10 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                                     ? true
                                                     : false
                                             }
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                setFormPendaftaran({
+                                                    ...formPendaftaran, id_grup: parseInt(e.target.value)
+                                                })
                                                 setFormValue({
                                                     ...formValue,
                                                     id_grup: parseInt(
@@ -384,28 +401,19 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
 
                                                 })
                                             }
-                                            value={formValue.id_grup}
+                                            }
+                                            value={formPendaftaran.id_grup}
                                         >
                                             <option
-                                                value="none"
+                                                value={0}
                                                 selected
                                                 disabled
                                             >
-                                                {grup.length == 0
-                                                    ? "Tidak Tersedia"
-                                                    : "Pilih Salah Satu"}
+                                                {filterGrup(formPendaftaran.id_paket).length ? "Pilih Salah Satu" : "Tidak Tersedia"}
                                             </option>
-                                            {grup
-                                                .filter(
-                                                    (item) =>
-                                                        item.id_paket ==
-                                                        formPendaftaran.id_paket
-                                                )
-                                                .map((item) => (
-                                                    <option value={item.id}>
-                                                        {`${item.nama_grup} -(${item.kuota})`}
-                                                    </option>
-                                                ))}
+                                            {filterGrup(formPendaftaran.id_paket).map(item => (
+                                                <option value={item.id}>{item.nama_grup}</option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
@@ -420,7 +428,8 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                         <div className="title mb-1">
                                             <p>Guru</p>
                                         </div>
-                                        <div className="w-full h-48 flex flex-col flex-wrap overflow-auto hide-scrollbar box-border">
+                                        <div
+                                            className="w-full h-48 flex flex-col flex-wrap overflow-auto hide-scrollbar box-border">
                                             {guru.map((item) => (
                                                 <div
                                                     className={[
@@ -444,7 +453,8 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                                         alt=""
                                                         className="h-full object-cover rounded-md group-hover:blur-sm"
                                                     />
-                                                    <div className="absolute bottom-0 left-0 rounded-b-md w-full p-2 font-bold bg-merah-bs text-white hidden group-hover:block">
+                                                    <div
+                                                        className="absolute bottom-0 left-0 rounded-b-md w-full p-2 font-bold bg-merah-bs text-white hidden group-hover:block">
                                                         {item.nama}
                                                     </div>
                                                 </div>
@@ -576,10 +586,10 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                                             formPendaftaran.id_paket == 0
                                                 ? 0
                                                 : paket.filter(
-                                                      (item) =>
-                                                          item.id ==
-                                                          formPendaftaran.id_paket
-                                                  )[0]?.harga
+                                                    (item) =>
+                                                        item.id ==
+                                                        formPendaftaran.id_paket
+                                                )[0]?.harga
                                         }
                                     />
                                 </div>
@@ -604,7 +614,8 @@ export default function FormPendaftaran({setDataPendaftaran, dataPendaftaran}) {
                             </div>
                         </div>
                         <div className="footer-form w-full h-[10%] flex items-center justify-end bg-biru-bs p-4">
-                            <button className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white" onClick={(e) => daftarPeserta(e)}>
+                            <button className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
+                                    onClick={(e) => daftarPeserta(e)}>
                                 Simpan
                             </button>
                         </div>

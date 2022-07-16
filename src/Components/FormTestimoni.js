@@ -4,22 +4,86 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 
-export default function FormTestimoni({ showForm, setShowForm }) {
+export default function FormTestimoni({ showForm, setShowForm, handleTestimoni }) {
     const [siswa, setSiswa] = useState([]);
     const [pendaftaran, setPendaftaran] = useState([]);
+    const [filterPendaftaran, setFilterPendaftaran] = useState([])
+    const [filterTool, setFilterTool] = useState({
+        nama_siswa: ""
+    })
+    const [formData, setFormData] = useState({
+        id_pendaftaran: 0,
+        deskripsi: ""
+    })
 
     useEffect(() => {
+        let nama_siswa = []
         axios
             .get(`${process.env.REACT_APP_API}/peserta-didik`)
-            .then((res) => setSiswa([...res.data.data]));
+            .then((res) => {
+                nama_siswa = [...res.data.data]
+                setSiswa([...res.data.data])
+            });
         axios
-            .get(`${process.env.REACT_APP_API}/pendaftaran`)
-            .then((res) => setPendaftaran([...res.data.data]));
+            .get(`${process.env.REACT_APP_API}/testimoni/pendaftaran`)
+            .then((res) => {
+                let hasil = res.data.data.map(item => {
+                    return {
+                        ...item,
+                        nama: nama_siswa.filter(s => s.id == item.id_siswa)[0]?.nama
+                    }
+                })
+                console.log(hasil)
+                setPendaftaran([...hasil])
+                setFilterPendaftaran([...hasil])
+            });
+        searchTool("")
     }, []);
 
+    const resetFormData = () => {
+        setFormData({
+            id_pendaftaran: 0,
+            deskripsi: ""
+        })
+    }
+
     const handleShow = () => {
+        if(showForm){
+            resetFormData()
+        }
         setShowForm(!showForm);
     };
+
+    const searchTool = (value) => {
+        let hasil = pendaftaran.map(item => {
+            return {
+                ...item,
+                nama: siswa.filter(s => s.id == item.id_siswa)[0]?.nama
+            }
+        })
+        // console.log(hasil)
+        if (!value) {
+            setFilterPendaftaran([...hasil]);
+        } else {
+            let result = [...hasil].filter(
+                (item) =>
+                    item.nama.toLowerCase().indexOf(value.toLowerCase()) !== -1
+            );
+            setFilterPendaftaran(result);
+            // console.log(result)
+        }
+    }
+
+    const tambahTestimoni = (e) => {
+        e.preventDefault()
+        axios.post(`${process.env.REACT_APP_API}/testimoni`, formData)
+            .then((res) => {
+                handleTestimoni(res.data.data)
+                Swal.fire("Berhasil", "Testimoni Baru Berhasil Ditambahkan!", "success")
+            })
+        handleShow()
+        // console.log(formData)
+    }
 
     return (
         <div className="">
@@ -74,31 +138,33 @@ export default function FormTestimoni({ showForm, setShowForm }) {
                                         // }
                                         className="p-2 w-full rounded-md border border-abu-bs"
                                         placeholder="cth: Bambang Anak Pak Budi"
-                                        // onChange={(e) => {
-                                        //     handleSearch(e);
-                                        // }}
+                                        onChange={(e) => {
+                                            setFilterTool({...filterTool, nama_siswa : e.target.value})
+                                            searchTool(e.target.value);
+                                        }}
+                                        value={filterTool.nama_siswa}
                                         // value={formPendaftaran.nama_siswa}
                                     />
                                     <div className="absolute bottom-0 right-0 w-8 h-full flex items-center cursor-pointer">
-                                        {/* {formValue.id_siswa == -1 && (
+                                        {formData.id_pendaftaran < 1 && (
                                             <i class="fa-solid fa-magnifying-glass"></i>
-                                        )} */}
+                                        )}
 
-                                        {/* {formValue.id_siswa != -1 && (
+                                        {formData.id_pendaftaran >= 1 && (
                                             <i
                                                 class="fa-solid fa-xmark hover:bg-merah-bs hover:text-white rounded-md p-1"
                                                 onClick={(e) => {
-                                                    setFormPendaftaran({
-                                                        ...formPendaftaran,
+                                                    setFilterTool({
+                                                        ...filterTool,
                                                         nama_siswa: "",
                                                     });
-                                                    setFormValue({
-                                                        ...formValue,
-                                                        id_siswa: -1,
+                                                    setFormData({
+                                                        ...formData,
+                                                        id_pendaftaran: 0,
                                                     });
                                                 }}
                                             ></i>
-                                        )} */}
+                                        )}
                                     </div>
                                 </div>
                                 <div className="result-search w-full h-48 border-x border-b border-abu-bs rounded-md p-2 pt-0 overflow-auto">
@@ -106,30 +172,30 @@ export default function FormTestimoni({ showForm, setShowForm }) {
                                         Nama Siswa
                                     </h1>
                                     <ul>
-                                        {/* {filteredSiswa.length ? (
-                                            filteredSiswa.map((item) => (
+                                        {filterPendaftaran.length ? (
+                                            filterPendaftaran.map((item) => (
                                                 <li
                                                     className="p-2 hover:bg-merah-bs hover:text-white hover:rounded-md border-b border-abu-bs"
                                                     onClick={() => {
-                                                        setFormPendaftaran({
-                                                            ...formPendaftaran,
-                                                            nama_siswa:
-                                                                item.nama,
+                                                        setFormData({
+                                                            ...formData,
+                                                            id_pendaftaran:
+                                                                item.id,
                                                         });
-                                                        setFormValue({
-                                                            ...formValue,
-                                                            id_siswa: item.id,
+                                                        setFilterTool({
+                                                            ...filterTool,
+                                                            nama_siswa: item.nama,
                                                         });
                                                     }}
                                                 >
-                                                    {`${item.nama} - ${item.asal_sekolah}`}
+                                                    {`${item.nama} - ${item.nama_grup} - ${item.nama_paket}`}
                                                 </li>
                                             ))
                                         ) : (
                                             <p className="text-center opacity-50">
                                                 Tidak ada siswa
                                             </p>
-                                        )} */}
+                                        )}
                                     </ul>
                                 </div>
                             </div>
@@ -145,13 +211,13 @@ export default function FormTestimoni({ showForm, setShowForm }) {
                                         rows="5"
                                         className="p-2 border border-abu-bs w-full rounded-md"
                                         placeholder="cth: Mantap!"
-                                        // onChange={(e) => {
-                                        //     setFormData({
-                                        //         ...formData,
-                                        //         alamat: e.target.value,
-                                        //     });
-                                        // }}
-                                        // value={formData.alamat}
+                                        onChange={(e) => {
+                                            setFormData({
+                                                ...formData,
+                                                deskripsi: e.target.value,
+                                            });
+                                        }}
+                                        value={formData.deskripsi}
                                     ></textarea>
                                 </div>
                             </div>
@@ -159,7 +225,7 @@ export default function FormTestimoni({ showForm, setShowForm }) {
                         <div className="footer-form w-full h-[10%] flex items-center justify-end bg-biru-bs p-4">
                             <button
                                 className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
-                                // onClick={(e) => daftarPeserta(e)}
+                                onClick={(e) => tambahTestimoni(e)}
                             >
                                 Simpan
                             </button>

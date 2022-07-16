@@ -3,6 +3,7 @@ import axios from "axios";
 import Table from "./SmartComponent/Table";
 import FormPendaftaran from "./FormPendaftaran";
 import { DataGrid } from "@mui/x-data-grid";
+import Swal from "sweetalert2";
 
 export default function TablePendaftaran() {
     const [dataPendaftaran, setDataPendaftaran] = useState([]);
@@ -84,13 +85,13 @@ export default function TablePendaftaran() {
                     <div className="w-full h-fit flex justify-center gap-3">
                         <button
                             className="p-2 border border-black rounded-md w-fit"
-                            // onClick={(e) => updateGuru(params.row.id_guru)}
+                            // onClick={(e) => updateGuru(params.row.id_pendaftaran)}
                         >
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                         <button
                             className="p-2 bg-merah-bs text-white rounded-md border border-merah-bs w-fit"
-                            // onClick={(e) => hapusGuru(params.row.id_guru)}
+                            onClick={(e) => hapusPendaftaran(params.row.id_pendaftaran)}
                         >
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -115,6 +116,33 @@ export default function TablePendaftaran() {
             };
         });
     };
+
+    const hapusPendaftaran = (id) => {
+        Swal.fire({
+            title: "Apakah Kamu Yakin?",
+            text: "Kamu akan menghapus pendaftaran ini!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, Saya Yakin!",
+            cancelButtonText: "Ga AH, Saya Ga Yakin ",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete(`${process.env.REACT_APP_API}/pendaftaran/${id}`)
+                    .then((res) => {
+                            setDataPendaftaran(
+                                dataPendaftaran.filter(
+                                    (item) => item.id != res.data.data.id
+                                )
+                            )
+                        Swal.fire("Berhasil", "Berhasil Menghapus Pendaftaran!", "success")
+                        }
+                    );
+            }
+        });
+    }
 
     return (
         <>
