@@ -125,10 +125,8 @@ export default function TableSiswa() {
             headerName: "Jenjang",
             width: 70,
             renderCell: (params) => {
-                return jenjang.filter((j) => j.id == params.row.Jenjang)[0]?.akronim;
-                // return jenjang.filter((j) => j.id == params.row.jenjang)[0][
-                //     "akronim"
-                // ];
+                return jenjang.filter((j) => j.id == params.row.Jenjang)[0]
+                    ?.akronim;
             },
         },
         { field: "Asal Sekolah", headerName: "Asal Sekolah", width: 100 },
@@ -140,13 +138,21 @@ export default function TableSiswa() {
             renderCell: (params) => {
                 return (
                     <div>
-                        <i
+                        <img
+                            src={`${process.env.REACT_APP_API}/${params.value}`}
+                            alt=""
+                            className="h-full w-auto"
+                            onClick={(e) => {
+                                showFotoPeserta(params.row.id_peserta);
+                            }}
+                        />
+                        {/* <i
                             class="fa-solid fa-eye"
                             onClick={(e) => {
                                 showFotoPeserta(params.row.id_peserta);
                             }}
                         ></i>{" "}
-                        {`  ...${params.value}`}
+                        {`  ...${params.value}`} */}
                     </div>
                 );
             },

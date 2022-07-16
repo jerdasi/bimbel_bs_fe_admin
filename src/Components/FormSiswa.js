@@ -2,55 +2,77 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
-// import { useEffect } from "react";
 
 export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
     const [filteredKelas, setFilteredKelas] = useState([]);
-    // const [show, setShow] = useState(false);
     const [jenjang, setJenjang] = useState([]);
     const [kelas, setKelas] = useState([]);
     const [formData, setFormData] = useState(siswa);
 
     const handleShow = () => {
-        setFormData({
-            nama: "",
-            tempat: "",
-            tanggal_lahir: new Date(),
-            alamat: "",
-            id_jenjang: 0,
-            asal_sekolah: "",
-            fotoPeserta: null,
-            nama_ayah: "",
-            nama_ibu: "",
-            telepon_anak: "",
-            telepon_ayah: "",
-            telepon_ibu: "",
-        });
+        if (show) {
+            setFormData({
+                nama: "",
+                tempat: "",
+                tanggal_lahir: new Date(),
+                alamat: "",
+                id_jenjang: 0,
+                asal_sekolah: "",
+                fotoPeserta: null,
+                nama_ayah: "",
+                nama_ibu: "",
+                telepon_anak: "",
+                telepon_ayah: "",
+                telepon_ibu: "",
+            });
+        }
+
         setShow(!show);
     };
 
     const tambahSiswa = (event) => {
         event.preventDefault();
-        delete formData["id_kelas"];
-        const config = {
-            headers: { "Content-Type": "multipart/form-data" },
-        };
-        let form_data = new FormData();
-        for (let key in formData) {
-            form_data.append(key, formData[key]);
+
+        if (
+            formData.nama != "" ||
+            formData.tempat != "" ||
+            formData.alamat != "" ||
+            formData.id_jenjang != 0 ||
+            formData.asal_sekolah != "" ||
+            formData.telepon_ayah != "" ||
+            formData.telepon_ibu != ""
+        ) {
+            delete formData["id_kelas"];
+            const config = {
+                headers: { "Content-Type": "multipart/form-data" },
+            };
+            let form_data = new FormData();
+            for (let key in formData) {
+                form_data.append(key, formData[key]);
+            }
+            axios
+                .post(
+                    `${process.env.REACT_APP_API}/peserta-didik`,
+                    form_data,
+                    config
+                )
+                .then((res) => {
+                    handlePeserta(res.data.data);
+                    handleShow();
+                    Swal.fire(
+                        "Berhasil",
+                        "Berhasil Menamabah Peserta Didik Baru",
+                        "success"
+                    );
+                })
+                .catch((err) => console.log(err));
+        } else {
+            Swal.fire(
+                "Gagal",
+                "Harap Lengkapi Form Pengisian Yang Bersifat Wajib",
+                "error"
+            );
         }
-        axios
-            .post(
-                `${process.env.REACT_APP_API}/peserta-didik`,
-                form_data,
-                config
-            )
-            .then((res) => {
-                handlePeserta(res.data.data);
-                handleShow();
-                Swal.fire("Berhasil","Berhasil Menamabah Peserta Didik Baru","success")
-            })
-            .catch((err) => console.log(err));
     };
 
     const editSiswa = (event) => {
@@ -72,9 +94,12 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
             .then((res) => {
                 handlePeserta(res.data.data, formData.id);
                 handleShow();
-                Swal.fire("Berhasil","Berhasil Mengubah Informasi Peserta Didik","success")
+                Swal.fire(
+                    "Berhasil",
+                    "Berhasil Mengubah Informasi Peserta Didik",
+                    "success"
+                );
             });
-        // handlePeserta("Tes", 35);
     };
 
     // Use Effect
@@ -91,6 +116,7 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
         setFormData(siswa);
     }, [siswa]);
 
+    // Function Filter Kelas Berdasarkan Jenjang
     const filterKelas = (id) => {
         setFilteredKelas(
             kelas.filter((item) => {
@@ -136,7 +162,7 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                             </h1>
                             <div
                                 className="close-button text-xl absolute top-0 right-4 cursor-pointer font-bold"
-                                onClick={(e) => setShow(!show)}
+                                onClick={handleShow}
                             >
                                 X
                             </div>
@@ -144,7 +170,10 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                         <div className="body-form h-[80%] overflow-scroll p-4">
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Nama</p>
+                                    <p>
+                                        Nama{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field">
                                     <input
@@ -166,7 +195,10 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
 
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Tempat, Tanggal Lahir</p>
+                                    <p>
+                                        Tempat, Tanggal Lahir{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field flex gap-2">
                                     <input
@@ -189,9 +221,6 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                                         id="tanggal_siswa"
                                         className="p-2 w-1/2 rounded-md border border-abu-bs"
                                         placeholder="dd-mm-yyyy"
-                                        defaultValue={moment(
-                                            formData.tanggal_lahir
-                                        ).format("yyyy-MM-DD")}
                                         value={moment(
                                             formData.tanggal_lahir
                                         ).format("yyyy-MM-DD")}
@@ -209,7 +238,10 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
 
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Alamat</p>
+                                    <p>
+                                        Alamat{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field">
                                     <textarea
@@ -232,12 +264,21 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                             <div className="row mb-3 flex gap-2">
                                 <div className="row mb-3 w-1/2">
                                     <div className="title mb-1">
-                                        <p>Jenjang</p>
+                                        <p>
+                                            Jenjang{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <select
                                             name="jenjang"
                                             id="jenjang"
+                                            defaultValue={0}
+                                            value={parseInt(
+                                                formData.id_jenjang
+                                            )}
                                             className="p-2 border border-abu-bs w-full rounded-md"
                                             onChange={(e) => {
                                                 filterKelas(e.target.value);
@@ -248,15 +289,15 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                                                     ),
                                                 });
                                             }}
-                                            value={parseInt(
-                                                formData.id_jenjang
-                                            )}
                                         >
-                                            <option value={0} selected disabled>
+                                            <option value={0} disabled>
                                                 Pilih Salah Satu
                                             </option>
-                                            {jenjang.map((item) => (
-                                                <option value={item.id}>
+                                            {jenjang.map((item, index) => (
+                                                <option
+                                                    value={item.id}
+                                                    key={index}
+                                                >
                                                     {`${item.nama_jenjang} - ${item.akronim}`}
                                                 </option>
                                             ))}
@@ -270,6 +311,8 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                                     <select
                                         name="kelas"
                                         id="kelas"
+                                        defaultValue={0}
+                                        value={formData.id_kelas}
                                         className="p-2 border border-abu-bs w-full rounded-md"
                                         onChange={(e) =>
                                             setFormData({
@@ -278,11 +321,11 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                                             })
                                         }
                                     >
-                                        <option value="none" selected disabled>
+                                        <option value="0" disabled>
                                             Pilih Salah Satu
                                         </option>
-                                        {filteredKelas.map((item) => (
-                                            <option value={item.id}>
+                                        {filteredKelas.map((item, index) => (
+                                            <option value={item.id} key={index}>
                                                 {item.tingkat_kelas}
                                             </option>
                                         ))}
@@ -292,7 +335,10 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
 
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Asal Sekolah</p>
+                                    <p>
+                                        Asal Sekolah{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field">
                                     <input
@@ -314,7 +360,10 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
 
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Foto</p>
+                                    <p>
+                                        Foto{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field">
                                     <input
@@ -335,7 +384,12 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                             <div className="row mb-3 flex gap-2">
                                 <div className="row mb-3 w-1/2">
                                     <div className="title mb-1">
-                                        <p>Nama Ayah</p>
+                                        <p>
+                                            Nama Ayah{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <input
@@ -356,7 +410,12 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                                 </div>
                                 <div className="row mb-3 w-1/2">
                                     <div className="title mb-1">
-                                        <p>Nama Ibu</p>
+                                        <p>
+                                            Nama Ibu{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <input
@@ -402,7 +461,12 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                             <div className="row mb-3 flex gap-2">
                                 <div className="row mb-3 w-1/2">
                                     <div className="title mb-1">
-                                        <p>Telepon Ayah</p>
+                                        <p>
+                                            Telepon Ayah{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <input
@@ -424,7 +488,12 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                                 </div>
                                 <div className="row mb-3 w-1/2">
                                     <div className="title mb-1">
-                                        <p>Telepon Ibu</p>
+                                        <p>
+                                            Telepon Ibu{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <input

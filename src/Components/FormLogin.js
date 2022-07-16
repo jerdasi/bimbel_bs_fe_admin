@@ -11,6 +11,7 @@ export default function FormLogin() {
         event.preventDefault();
         if (username === "admin" && password === "admin") {
             navigate("/dashboard");
+            // navigate("/dashboard", { state: { id: 1, id_paket: 1 } });
         } else {
             Swal.fire(
                 "Login Gagal",
