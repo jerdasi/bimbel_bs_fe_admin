@@ -114,7 +114,22 @@ export default function TableSiswa() {
     };
 
     const columns = [
-        { field: "Nama", headerName: "Nama", width: 200 },
+        {
+            field: "id",
+            headerName: "No",
+            width: 70,
+            renderCell: (params) => {
+                return <>{params.value + 1}</>;
+            },
+        },
+        {
+            field: "Nama",
+            headerName: "Nama",
+            width: 250,
+            renderCell: (params) => {
+                return <b className="uppercase">{params.value}</b>;
+            },
+        },
         {
             field: "Tempat/TanggalLahir",
             headerName: "Tempat / Tanggal Lahir",
@@ -146,13 +161,6 @@ export default function TableSiswa() {
                                 showFotoPeserta(params.row.id_peserta);
                             }}
                         />
-                        {/* <i
-                            class="fa-solid fa-eye"
-                            onClick={(e) => {
-                                showFotoPeserta(params.row.id_peserta);
-                            }}
-                        ></i>{" "}
-                        {`  ...${params.value}`} */}
                     </div>
                 );
             },

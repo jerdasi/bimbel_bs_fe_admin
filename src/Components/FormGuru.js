@@ -11,7 +11,6 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
     const [hari, setHari] = useState([]);
     const [jam, setJam] = useState([]);
     const [operasional, setOperasional] = useState([]);
-    const [kelas, setKelas] = useState([]);
     const [formData, setFormData] = useState(guru);
     const [pilihanOperasional, setPilihanOperasional] = useState([]);
     const [filterHari, setFilterHari] = useState("all");
@@ -29,31 +28,9 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
             motivasi_mengajar: "",
         });
         setShow(!show);
-        console.log(formData.id);
-        if (!guru.id) {
-            console.log("Baru");
-            // let pilihan = operasional.map((item) => {
-            //     return {
-            //         id: item.id,
-            //         id_hari: item.id_hari,
-            //         checked: false,
-            //     };
-            // });
-            // setPilihanOperasional(pilihan);
-        } else {
-            console.log("Edit");
-            // let pilihan = operasional.map((item) => {
-            //     return {
-            //         id: item.id,
-            //         id_hari: item.id_hari,
-            //         checked: true,
-            //     };
-            // });
-            // setPilihanOperasional(pilihan);
-        }
-        console.log(formData);
     };
 
+    // Function Tambah Guru Baru
     const tambahGuru = (event) => {
         console.log("Jalan");
         event.preventDefault();
@@ -108,6 +85,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
             .catch((err) => console.log(err));
     };
 
+    // Function Update/Edit Data Guru
     const editGuru = (event) => {
         event.preventDefault();
         // delete formData["id_kelas"];
@@ -118,6 +96,10 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
         for (let key in formData) {
             form_data.append(key, formData[key]);
         }
+
+        let jadwal_update = handleBuatJadwal();
+        jadwal_update.id_guru = formData.id;
+        // Flow Melakukan Edit Jadwal adalah menghapus semua jadwal guru tersebut sebelumnya dan mengirim ulang semua jadwal baru
         axios
             .put(
                 `${process.env.REACT_APP_API}/guru/${formData.id}`,
@@ -126,9 +108,66 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
             )
             .then((res) => {
                 handleGuru(res.data.data, formData.id);
+                handleHapusJadwal();
+                axios
+                    .post(
+                        `${process.env.REACT_APP_API}/waktu-guru`,
+                        jadwal_update
+                    )
+                    .then((res) => {
+                        setPilihanOperasional([...jadwal_update.jadwal]);
+                        Swal.fire(
+                            "Berhasil",
+                            "Berhasil Merubah Guru dan Jadwal",
+                            "success"
+                        );
+                    });
                 handleShow();
+                setGuru({
+                    nama: "",
+                    tempat: "",
+                    tanggal_lahir: moment().format("DD-MM-YYYY"),
+                    pendidikan_terakhir: "",
+                    fotoGuru: null,
+                    alamat: "",
+                    telepon: "",
+                    motivasi_mengajar: "",
+                });
             });
-        // handlePeserta("Tes", 35);
+    };
+
+    const handleBuatJadwal = () => {
+        let jadwal = pilihanOperasional
+            .map((item) => {
+                let data;
+                if (item.checked) {
+                    data = {
+                        id_hari_jam: item.id,
+                    };
+                }
+                return data;
+            })
+            .filter((notUndefined) => notUndefined !== undefined);
+        let jadwal_guru = {
+            id_guru: "",
+            jadwal,
+        };
+        return jadwal_guru;
+    };
+
+    const handleHapusJadwal = () => {
+        let id_delete;
+        axios
+            .get(`${process.env.REACT_APP_API}/waktu-guru?guru=${guru.id}`)
+            .then((res) => {
+                id_delete = res.data.data.map((item) => item.id);
+                axios
+                    .post(`${process.env.REACT_APP_API}/waktu-guru/hapus`, {
+                        id: id_delete,
+                    })
+                    .then((res) => console.log("Berhaasil"));
+                console.log(id_delete);
+            });
     };
 
     // Use Effect
@@ -141,6 +180,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
         });
         axios.get(`${process.env.REACT_APP_API}/hari-jam`).then((res) => {
             setOperasional([...res.data.data]);
+            // Mengubah Menjadi Versi Mudah untuk mengumpulkan jadwal
             let pilihan = res.data.data.map((item) => {
                 return {
                     id: item.id,
@@ -184,39 +224,8 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                         }
                         // console.log(element.id_hari_jam);
                     });
-                    console.log({ hasil: hasil });
-                    console.log({ pilihan: pilihan });
-                    console.log({ operasional: operasional });
+
                     setPilihanOperasional(pilihan);
-                    // let pilihan = [...operasional];
-                    // pilihan = pilihan.map((item) => {
-                    //     return {
-                    //         id: item.id,
-                    //         id_hari: item.id_hari,
-                    //         checked: false,
-                    //     };
-                    // });
-                    // console.log({ pilihanLama: pilihan });
-                    // console.log(guru.id);
-                    // console.log(hasil);
-                    // // hasil.splice(0, 10);
-                    // // console.log(hasil);
-                    // hasil.forEach((element) => {
-                    //     if (
-                    //         pilihan.findIndex(
-                    //             (item) => item.id == element.id_hari_jam
-                    //         )
-                    //     ) {
-                    //         pilihan[
-                    //             pilihan.findIndex(
-                    //                 (item) => item.id == element.id_hari_jam
-                    //             )
-                    //         ].checked = true;
-                    //     }
-                    //     // console.log(element.id_hari_jam);
-                    // });
-                    // console.log({ pilihanBaru: pilihan });
-                    // setPilihanOperasional(pilihan);
                 });
         }
     }, [guru]);
@@ -262,13 +271,16 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                         <div className="body-form h-[80%] overflow-scroll p-4">
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Nama</p>
+                                    <p>
+                                        Nama{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field">
                                     <input
                                         type="text"
-                                        name="nama_siswa"
-                                        id="nama_siswa"
+                                        name="nama_guru"
+                                        id="nama_guru"
                                         className="p-2 w-full rounded-md border border-abu-bs"
                                         placeholder="cth: Bambang Anak Pak Budi"
                                         onChange={(e) =>
@@ -284,13 +296,16 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
 
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Tempat, Tanggal Lahir</p>
+                                    <p>
+                                        Tempat, Tanggal Lahir{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field flex gap-2">
                                     <input
                                         type="text"
-                                        name="tempat_siswa"
-                                        id="tempat_siswa"
+                                        name="tempat_guru"
+                                        id="tempat_guru"
                                         className="p-2 w-1/2 rounded-md border border-abu-bs"
                                         placeholder="cth: Medan"
                                         onChange={(e) =>
@@ -303,8 +318,8 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                     />
                                     <input
                                         type="date"
-                                        name="tanggal_siswa"
-                                        id="tanggal_siswa"
+                                        name="tanggal_guru"
+                                        id="tanggal_guru"
                                         className="p-2 w-1/2 rounded-md border border-abu-bs"
                                         placeholder="dd-mm-yyyy"
                                         defaultValue={moment(
@@ -328,7 +343,12 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                             <div className="flex gap-2">
                                 <div className="row mb-3 w-3/4">
                                     <div className="title mb-1">
-                                        <p>Foto</p>
+                                        <p>
+                                            Foto{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <input
@@ -347,7 +367,12 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                 </div>
                                 <div className="row mb-3 w-1/4">
                                     <div className="title mb-1">
-                                        <p>Pend. Terakhir</p>
+                                        <p>
+                                            Pend. Terakhir{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <input
@@ -371,7 +396,10 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
 
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Alamat</p>
+                                    <p>
+                                        Alamat{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field">
                                     <textarea
@@ -393,13 +421,16 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
 
                             <div className="row mb-3 w-full">
                                 <div className="title mb-1">
-                                    <p>Telepon</p>
+                                    <p>
+                                        Telepon{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field">
                                     <input
                                         type="text"
-                                        name="telepon_anak"
-                                        id="telepon_anak"
+                                        name="telepon_guru"
+                                        id="telepon_guru"
                                         className="p-2 w-full rounded-md border border-abu-bs"
                                         placeholder="081212345678"
                                         onChange={(e) =>
@@ -415,7 +446,10 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
 
                             <div className="row mb-3">
                                 <div className="title mb-1">
-                                    <p>Motivasi Mengajar</p>
+                                    <p>
+                                        Motivasi Mengajar{" "}
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field">
                                     <textarea
@@ -439,7 +473,12 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                             <div className="row mb-3">
                                 <div className="flex justify-between mb-1 items-center">
                                     <div className="title text-merah-bs font-bold">
-                                        <p>Ketersediaan Mengajar</p>
+                                        <p>
+                                            Ketersediaan Mengajar{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                 </div>
 
@@ -452,13 +491,15 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                             setFilterHari(e.target.value)
                                         }
                                     >
+                                        {/* Nama Hari yang bisa Dipilih */}
                                         <option value="all">Semua Hari</option>
-                                        {hari.map((item) => (
-                                            <option value={item.id}>
+                                        {hari.map((item, index) => (
+                                            <option value={item.id} key={index}>
                                                 {item.nama_hari}
                                             </option>
                                         ))}
                                     </select>
+                                    {/* Select Box untuk Pilih Semua Hari */}
                                     <input
                                         type="checkbox"
                                         name="all_option"
@@ -479,6 +520,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                     Pilih Semua
                                     <br />
                                     {pilihanOperasional.map((item, index) => {
+                                        // Jika memilih hari spesifik
                                         if (filterHari != "all") {
                                             if (item.id_hari == filterHari) {
                                                 return (
@@ -541,15 +583,6 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                                         }}
                                                     />
                                                     {`${operasional[index].nama_hari}, ${operasional[index].nama_rentang}`}
-                                                    {/* {`${
-                                                    hari.find(
-                                                        (h) => h.id == item.id_hari
-                                                    ).nama_hari
-                                                }, ${
-                                                    jam.find(
-                                                        (j) => j.id == item.id_jam
-                                                    ).nama_rentang
-                                                }`} */}
                                                     <br />
                                                 </>
                                             );

@@ -99,7 +99,22 @@ export default function TableGuru() {
     };
 
     const columns = [
-        { field: "Nama", headerName: "Nama", width: 200 },
+        {
+            field: "id",
+            headerName: "No",
+            width: 70,
+            renderCell: (params) => {
+                return <>{params.value + 1}</>;
+            },
+        },
+        {
+            field: "Nama",
+            headerName: "Nama",
+            width: 250,
+            renderCell: (params) => {
+                return <b className="uppercase">{params.value}</b>;
+            },
+        },
         {
             field: "Tempat/TanggalLahir",
             headerName: "Tempat / Tanggal Lahir",
@@ -108,7 +123,7 @@ export default function TableGuru() {
         {
             field: "PendidikanTerakhir",
             headerName: "Pendidikan Terakhir",
-            width: 70,
+            width: 150,
         },
         {
             field: "Foto",
@@ -116,15 +131,13 @@ export default function TableGuru() {
             width: 150,
             renderCell: (params) => {
                 return (
-                    <div>
-                        <i
-                            class="fa-solid fa-eye"
-                            onClick={(e) => {
-                                showFotoGuru(params.row.id_guru);
-                            }}
-                        ></i>{" "}
-                        {`  ...${params.value}`}
-                    </div>
+                    <img
+                        src={`${process.env.REACT_APP_API}/${params.value}`}
+                        alt=""
+                        onClick={(e) => {
+                            showFotoGuru(params.row.id_guru);
+                        }}
+                    />
                 );
             },
         },
