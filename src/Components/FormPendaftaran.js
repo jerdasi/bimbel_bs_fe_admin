@@ -21,9 +21,10 @@ export default function FormPendaftaran({
     const [jam, setJam] = useState([]);
     const [hariGuru, setHariGuru] = useState([]);
     const [jamGuru, setJamGuru] = useState([]);
-    const [jenisPaket, setJenisPaket] = useState([]);
+    const [jenisPaket, setJenisPaket] = useState([]); //Menandak
     const [jadwalGuru, setJadwalGuru] = useState([]);
-
+    const [filteredSiswa, setFilteredSiswa] = useState([]);
+    // Ini untuk melakukan pendaftaran
     const [formValue, setFormValue] = useState({
         id_siswa: -1,
         id_grup: -1,
@@ -31,7 +32,7 @@ export default function FormPendaftaran({
         total_pembayaran: 0,
         status: "pending",
     });
-
+    // Ini untuk menampung saat memilih nama dari semua pendaftaran siswa
     const [formPendaftaran, setFormPendaftaran] = useState({
         nama_siswa: "",
         id_jenjang: 0,
@@ -40,8 +41,6 @@ export default function FormPendaftaran({
         sudah_bayar: false,
         id_guru: 0,
     });
-
-    const [filteredSiswa, setFilteredSiswa] = useState([]);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API}/peserta-didik`).then((res) => {
@@ -64,6 +63,7 @@ export default function FormPendaftaran({
             .get(`${process.env.REACT_APP_API}/guru`)
             .then((res) => setGuru(res.data.data));
 
+        // Ini Terjadi Ketika Mengklik Sebuah Paket Bimbingan
         if (formPendaftaran.id_paket != 0) {
             axios
                 .get(
@@ -79,7 +79,6 @@ export default function FormPendaftaran({
                         )
                     );
                 });
-            // setFormData({ ...formData, id_paket: idPaket });
             axios
                 .get(
                     `${process.env.REACT_APP_API}/grup-bimbel?paket=${formPendaftaran.id_paket}`
@@ -89,6 +88,7 @@ export default function FormPendaftaran({
                     setGrup(res.data.data);
                 });
         }
+        // Ini Terjadi apabila memilih seorang guru
         if (formPendaftaran.id_guru != 0) {
             axios
                 .get(
@@ -184,6 +184,23 @@ export default function FormPendaftaran({
     };
 
     const handleShow = () => {
+        if (show) {
+            setFormPendaftaran({
+                nama_siswa: "",
+                id_jenjang: 0,
+                id_paket: 0,
+                id_grup: 0,
+                sudah_bayar: false,
+                id_guru: 0,
+            });
+            setFormValue({
+                id_siswa: -1,
+                id_grup: -1,
+                tanggal_pendaftaran: new Date(),
+                total_pembayaran: 0,
+                status: "pending",
+            });
+        }
         setShow(!show);
     };
 

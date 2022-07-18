@@ -130,7 +130,9 @@ export default function SideBar() {
                         </li>
                         <li
                             className="md:border border-black md:bg-white hover:bg-merah-bs text-black hover:text-white py-3 px-4 md:p-3 rounded-md flex items-center justify-center md:block"
-                            onClick={() => handleNavigatePage(`/kelola-paket`)}
+                            onClick={() =>
+                                handleNavigatePage(`/kelola-absensi`)
+                            }
                         >
                             <i className="fa-solid fa-calendar-days text-2xl md:text-lg md:mr-2"></i>
                             <Link

@@ -4,12 +4,15 @@ import Table from "./SmartComponent/Table";
 import FormPendaftaran from "./FormPendaftaran";
 import { DataGrid } from "@mui/x-data-grid";
 import Swal from "sweetalert2";
+import moment from "moment";
 
 export default function TablePendaftaran() {
     const [dataPendaftaran, setDataPendaftaran] = useState([]);
     const [pendaftar, setPendaftar] = useState({});
     const [jenjang, setJenjang] = useState([]);
     const [siswa, setSiswa] = useState([]);
+    const [start, setStart] = useState(moment().format());
+    const [finish, setFinish] = useState(moment().format());
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API}/pendaftaran`).then((res) => {
@@ -84,14 +87,10 @@ export default function TablePendaftaran() {
                 return (
                     <div className="w-full h-fit flex justify-center gap-3">
                         <button
-                            className="p-2 border border-black rounded-md w-fit"
-                            // onClick={(e) => updateGuru(params.row.id_pendaftaran)}
-                        >
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button
                             className="p-2 bg-merah-bs text-white rounded-md border border-merah-bs w-fit"
-                            onClick={(e) => hapusPendaftaran(params.row.id_pendaftaran)}
+                            onClick={(e) =>
+                                hapusPendaftaran(params.row.id_pendaftaran)
+                            }
                         >
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -132,21 +131,24 @@ export default function TablePendaftaran() {
                 axios
                     .delete(`${process.env.REACT_APP_API}/pendaftaran/${id}`)
                     .then((res) => {
-                            setDataPendaftaran(
-                                dataPendaftaran.filter(
-                                    (item) => item.id != res.data.data.id
-                                )
+                        setDataPendaftaran(
+                            dataPendaftaran.filter(
+                                (item) => item.id != res.data.data.id
                             )
-                        Swal.fire("Berhasil", "Berhasil Menghapus Pendaftaran!", "success")
-                        }
-                    );
+                        );
+                        Swal.fire(
+                            "Berhasil",
+                            "Berhasil Menghapus Pendaftaran!",
+                            "success"
+                        );
+                    });
             }
         });
-    }
+    };
 
     return (
         <>
-            <div className="w-full h-full md:w-4/5 md:h-full md:p-4 flex flex-col md:justify-center">
+            <div className="w-full h-full md:w-4/5 md:h-full md:p-4 flex flex-col">
                 <h1 className="text-3xl font-bold text-merah-bs h-16 border-b border-biru-bs mb-1 flex items-center">
                     Kelola Transaksi
                 </h1>
@@ -160,6 +162,24 @@ export default function TablePendaftaran() {
                                 type="date"
                                 name="start_laporan"
                                 id="start_laporan"
+                                value={moment(start).format("yyyy-MM-DD")}
+                                onChange={(e) => {
+                                    if (
+                                        moment(e.target.value).format() >
+                                        moment(finish).format()
+                                    ) {
+                                        setStart(finish);
+                                        Swal.fire(
+                                            "Gagal",
+                                            "Tanggal Awal Tidak Boleh Melewati Tanggal Akhir",
+                                            "warning"
+                                        );
+                                    } else {
+                                        setStart(
+                                            moment(e.target.value).format()
+                                        );
+                                    }
+                                }}
                                 className="h-full border border-abu-bs rounded-md px-2 py-1 w-3/4"
                             />
                         </div>
@@ -171,6 +191,24 @@ export default function TablePendaftaran() {
                                 type="date"
                                 name="end_laporan"
                                 id="end_laporan"
+                                value={moment(finish).format("yyyy-MM-DD")}
+                                onChange={(e) => {
+                                    if (
+                                        moment(e.target.value).format() <
+                                        moment(finish).format()
+                                    ) {
+                                        setFinish(start);
+                                        Swal.fire(
+                                            "Gagal",
+                                            "Tanggal Awal Tidak Boleh Melewati Tanggal Akhir",
+                                            "warning"
+                                        );
+                                    } else {
+                                        setFinish(
+                                            moment(e.target.value).format()
+                                        );
+                                    }
+                                }}
                                 className="h-full border border-abu-bs rounded-md px-2 py-1 w-3/4"
                             />
                         </div>
@@ -180,7 +218,7 @@ export default function TablePendaftaran() {
                         </button>
                     </div>
                 </div>
-                <div className="w-full h-[75vh]">
+                <div className="w-full h-[65vh]">
                     <DataGrid
                         rows={convertToDataTable(dataPendaftaran)}
                         columns={columns}
@@ -196,7 +234,10 @@ export default function TablePendaftaran() {
                         }}
                     />
                 </div>
-                <FormPendaftaran setDataPendaftaran={setDataPendaftaran} dataPendaftaran={dataPendaftaran}/>
+                <FormPendaftaran
+                    setDataPendaftaran={setDataPendaftaran}
+                    dataPendaftaran={dataPendaftaran}
+                />
             </div>
         </>
     );

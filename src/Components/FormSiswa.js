@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
     const [filteredKelas, setFilteredKelas] = useState([]);
     const [jenjang, setJenjang] = useState([]);
     const [kelas, setKelas] = useState([]);
     const [formData, setFormData] = useState(siswa);
+
+    const navigate = useNavigate();
 
     const handleShow = () => {
         if (show) {
@@ -61,9 +64,10 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
                     handleShow();
                     Swal.fire(
                         "Berhasil",
-                        "Berhasil Menamabah Peserta Didik Baru",
+                        "Berhasil Menamabah Peserta Didik Baru! Silahkan Lanjutkan Pendaftaran!",
                         "success"
                     );
+                    navigate("/kelola-pendaftaran");
                 })
                 .catch((err) => console.log(err));
         } else {

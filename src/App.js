@@ -12,6 +12,7 @@ import KelolaPendaftaran from "./Pages/KelolaPendaftaran";
 import KelolaTestimoni from "./Pages/KelolaTestimoni";
 import KelolaPaket from "./Pages/KelolaPaket";
 import KelolaGuru from "./Pages/KelolaGuru";
+import KelolaAbsensi from "./Pages/KelolaAbsensi";
 
 const App = () => {
     return (
@@ -40,6 +41,11 @@ const App = () => {
                         exact
                         path="/kelola-paket"
                         element={<KelolaPaket />}
+                    />
+                    <Route
+                        exact
+                        path="/kelola-absensi"
+                        element={<KelolaAbsensi />}
                     />
                 </Routes>
             </Router>
