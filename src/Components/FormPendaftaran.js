@@ -111,6 +111,7 @@ export default function FormPendaftaran({
             ...formValue,
             tanggal_pendaftaran: new Date(),
             id_grup: parseInt(formValue.id_grup),
+            status: formPendaftaran.sudah_bayar ? "selesai" : "pending",
         };
 
         if (jenisPaket.kuota != null) {
@@ -253,7 +254,10 @@ export default function FormPendaftaran({
                             {/* Siswa */}
                             <div className="row mb-6">
                                 <div className="title mb-1">
-                                    <p>Cari Siswa</p>
+                                    <p>
+                                        Cari Siswa
+                                        <span className="text-merah-bs">*</span>
+                                    </p>
                                 </div>
                                 <div className="input-field relative">
                                     <input
@@ -334,7 +338,12 @@ export default function FormPendaftaran({
                                 {/* Jenjang */}
                                 <div className="row mb-3 w-full">
                                     <div className="title mb-1">
-                                        <p>Jenjang</p>
+                                        <p>
+                                            Jenjang
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <select
@@ -371,7 +380,12 @@ export default function FormPendaftaran({
                                 {/* Paket */}
                                 <div className="row mb-3 flex-1">
                                     <div className="title mb-1">
-                                        <p>Pilihan Paket Bimbingan Belajar</p>
+                                        <p>
+                                            Pilihan Paket Bimbingan Belajar
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <select
@@ -417,7 +431,12 @@ export default function FormPendaftaran({
                                 {/* Grup */}
                                 <div className="row mb-3 flex-1">
                                     <div className="title mb-1">
-                                        <p>Pilih Grup</p>
+                                        <p>
+                                            Pilih Grup
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="input-field">
                                         <select
@@ -512,7 +531,12 @@ export default function FormPendaftaran({
                                     </div>
 
                                     <div className="title font-bold mt-8 mb-1">
-                                        <p>Atur Jadwal Grup</p>
+                                        <p>
+                                            Atur Jadwal Grup{" "}
+                                            <span className="text-merah-bs">
+                                                *
+                                            </span>
+                                        </p>
                                     </div>
                                     <div className="w-full h-32 overflow-auto">
                                         {[

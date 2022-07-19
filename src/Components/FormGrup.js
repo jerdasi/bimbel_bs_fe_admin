@@ -182,17 +182,19 @@ export default function FormGrup({
     };
 
     const getJadwal = (id) => {
+        setJadwal([]);
         axios
             .get(`${process.env.REACT_APP_API}/jadwal-grup?grup=${id}`)
             .then((res) => {
-                setJadwal([
+                let new_jadwal = [
                     ...res.data.data.map((item) => {
                         let { id_hari, id_jam } = operasional.filter(
                             (o) => item.id_hari_jam == o.id
                         )[0];
                         return { id_hari, id_jam };
                     }),
-                ]);
+                ];
+                setJadwal([...new_jadwal]);
                 // console.log({JadwalGrup: res.data.data})
                 // console.log({Operasional: operasional})
                 // console.log({Jadwal: jadwal})

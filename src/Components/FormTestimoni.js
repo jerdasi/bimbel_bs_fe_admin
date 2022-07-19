@@ -4,63 +4,66 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 
-export default function FormTestimoni({ showForm, setShowForm, handleTestimoni }) {
+export default function FormTestimoni({
+    showForm,
+    setShowForm,
+    handleTestimoni,
+}) {
     const [siswa, setSiswa] = useState([]);
     const [pendaftaran, setPendaftaran] = useState([]);
-    const [filterPendaftaran, setFilterPendaftaran] = useState([])
+    const [filterPendaftaran, setFilterPendaftaran] = useState([]);
     const [filterTool, setFilterTool] = useState({
-        nama_siswa: ""
-    })
+        nama_siswa: "",
+    });
     const [formData, setFormData] = useState({
         id_pendaftaran: 0,
-        deskripsi: ""
-    })
+        deskripsi: "",
+    });
 
     useEffect(() => {
-        let nama_siswa = []
-        axios
-            .get(`${process.env.REACT_APP_API}/peserta-didik`)
-            .then((res) => {
-                nama_siswa = [...res.data.data]
-                setSiswa([...res.data.data])
-            });
+        let nama_siswa = [];
+        axios.get(`${process.env.REACT_APP_API}/peserta-didik`).then((res) => {
+            nama_siswa = [...res.data.data];
+            setSiswa([...res.data.data]);
+        });
         axios
             .get(`${process.env.REACT_APP_API}/testimoni/pendaftaran`)
             .then((res) => {
-                let hasil = res.data.data.map(item => {
+                let hasil = res.data.data.map((item) => {
                     return {
                         ...item,
-                        nama: nama_siswa.filter(s => s.id == item.id_siswa)[0]?.nama
-                    }
-                })
-                console.log(hasil)
-                setPendaftaran([...hasil])
-                setFilterPendaftaran([...hasil])
+                        nama: nama_siswa.filter((s) => s.id == item.id_siswa)[0]
+                            ?.nama,
+                    };
+                });
+                console.log(hasil);
+                setPendaftaran([...hasil]);
+                setFilterPendaftaran([...hasil]);
             });
-        searchTool("")
+        searchTool("");
     }, []);
 
     const resetFormData = () => {
         setFormData({
             id_pendaftaran: 0,
-            deskripsi: ""
-        })
-    }
+            deskripsi: "",
+        });
+    };
 
     const handleShow = () => {
-        if(showForm){
-            resetFormData()
+        if (showForm) {
+            resetFormData();
         }
         setShowForm(!showForm);
     };
 
     const searchTool = (value) => {
-        let hasil = pendaftaran.map(item => {
+        let hasil = pendaftaran.map((item) => {
             return {
                 ...item,
-                nama: siswa.filter(s => s.id == item.id_siswa)[0]?.nama
-            }
-        })
+                nama: siswa.filter((s) => s.id == item.id_siswa)[0]?.nama,
+            };
+        });
         // console.log(hasil)
         if (!value) {
             setFilterPendaftaran([...hasil]);
@@ -72,18 +75,30 @@ export default function FormTestimoni({ showForm, setShowForm, handleTestimoni }
             setFilterPendaftaran(result);
             // console.log(result)
         }
-    }
+    };
 
     const tambahTestimoni = (e) => {
-        e.preventDefault()
-        axios.post(`${process.env.REACT_APP_API}/testimoni`, formData)
+        e.preventDefault();
+        axios
+            .post(`${process.env.REACT_APP_API}/testimoni`, formData)
             .then((res) => {
-                handleTestimoni(res.data.data)
-                Swal.fire("Berhasil", "Testimoni Baru Berhasil Ditambahkan!", "success")
-            })
-        handleShow()
+                axios
+                    .get(
+                        `${process.env.REACT_APP_API}/testimoni/${res.data.data.id}`
+                    )
+                    .then((res) => {
+                        handleTestimoni(res.data.data);
+                        Swal.fire(
+                            "Berhasil",
+                            "Testimoni Baru Berhasil Ditambahkan!",
+                            "success"
+                        );
+                    });
+                // handleTestimoni(res.data.data);
+            });
+        handleShow();
         // console.log(formData)
-    }
+    };
 
     return (
         <div className="">
@@ -139,7 +154,10 @@ export default function FormTestimoni({ showForm, setShowForm, handleTestimoni }
                                         className="p-2 w-full rounded-md border border-abu-bs"
                                         placeholder="cth: Bambang Anak Pak Budi"
                                         onChange={(e) => {
-                                            setFilterTool({...filterTool, nama_siswa : e.target.value})
+                                            setFilterTool({
+                                                ...filterTool,
+                                                nama_siswa: e.target.value,
+                                            });
                                             searchTool(e.target.value);
                                         }}
                                         value={filterTool.nama_siswa}
@@ -184,7 +202,8 @@ export default function FormTestimoni({ showForm, setShowForm, handleTestimoni }
                                                         });
                                                         setFilterTool({
                                                             ...filterTool,
-                                                            nama_siswa: item.nama,
+                                                            nama_siswa:
+                                                                item.nama,
                                                         });
                                                     }}
                                                 >

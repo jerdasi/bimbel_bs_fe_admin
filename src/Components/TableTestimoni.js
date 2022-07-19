@@ -47,7 +47,8 @@ export default function TableTestimoni() {
     // Id 0 artinya post, selain itu edit/update
     const handleTestimoni = (testimoniBaru, id = 0) => {
         if (id == 0) {
-            setTestimoni([...testimoni, testimoniBaru]);
+            setTestimoni([...testimoni, convertToDataTable(testimoniBaru)]);
+            // console.log(convertToDataTable(testimoniBaru));
         } else {
             let hasil = testimoni.findIndex((item) => item.id == id);
             let tempTestimoni = [...guru];
@@ -184,7 +185,13 @@ export default function TableTestimoni() {
                     />
                 </div>
             </div>
-            <FormTestimoni handleTestimoni={handleTestimoni} setShowForm={setShowForm} showForm={showForm} testimoni={testimoni} setTestimoni={setTestimoni}/>
+            <FormTestimoni
+                handleTestimoni={handleTestimoni}
+                setShowForm={setShowForm}
+                showForm={showForm}
+                testimoni={testimoni}
+                setTestimoni={setTestimoni}
+            />
         </>
     );
 }

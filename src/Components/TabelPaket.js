@@ -1,8 +1,8 @@
-import React, {useState, useEffect, useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import FormJenjang from "./FormJenjang";
 import Swal from "sweetalert2";
-import {PaketContext} from "../Context/PaketBimbingan";
+import { PaketContext } from "../Context/PaketBimbingan";
 import FormPaket from "./FormPaket";
 import FormGrup from "./FormGrup";
 
@@ -22,8 +22,8 @@ export default function TabelPaket() {
         setFormPurpose,
     } = useContext(PaketContext);
 
-    const [showGroup, setShowGroup] = useState(false)
-    const [idPaket, setIdPaket] = useState(0)
+    const [showGroup, setShowGroup] = useState(false);
+    const [idPaket, setIdPaket] = useState(0);
 
     const showPopUp = (title, description, icon) => {
         Swal.fire(`${title}!`, `${description}`, `${icon}`);
@@ -31,11 +31,11 @@ export default function TabelPaket() {
 
     // Axios Handle Request
     const handleRequest = async ({
-                                     method = "GET",
-                                     url = "",
-                                     data = {},
-                                     key = -1,
-                                 }) => {
+        method = "GET",
+        url = "",
+        data = {},
+        key = -1,
+    }) => {
         let endpoint = `${process.env.REACT_APP_API}/${url}${
             key !== -1 ? `/${key}` : ""
         }`;
@@ -219,8 +219,7 @@ export default function TabelPaket() {
     return (
         <>
             <div className="w-full md:w-4/5 flex flex-col md:p-4">
-                <div
-                    className="header text-3xl font-bold text-merah-bs h-16 border-b border-biru-bs mb-1 flex items-center">
+                <div className="header text-3xl font-bold text-merah-bs h-16 border-b border-biru-bs mb-1 flex items-center">
                     <h1>Kelola Paket Belajar</h1>
                 </div>
                 <div className="h-full w-full overflow-auto flex flex-wrap gap-4">
@@ -228,149 +227,160 @@ export default function TabelPaket() {
                     {jenjang.length === 0
                         ? "Tidak ada Paket Bimbingan"
                         : jenjang.map((item) => (
-                            <div
-                                className="w-full h-[40vh] flex flex-col my-4"
-                                key={item.id}
-                            >
-                                <div
-                                    className="w-full md:h-[10%] flex flex-col md:flex-row items-start md:items-center mb-2">
-                                    <h1 className="text-2xl w-fit md:w-3/5 h-full font-bold text-black/80 opacity-80">
-                                        {item.nama_jenjang}
-                                    </h1>
-                                    <div className="w-full md:w-2/5 h-full flex gap-2">
-                                        <button
-                                            className="h-full w-1/3 py-1 md:py-0 rounded-md border border-abu-bs hover:bg-abu-bs hover:border-black hover:text-white"
-                                            onClick={() => {
-                                                // Scroll Ke atas
-                                                window.scrollTo({
-                                                    top: 0,
-                                                    behavior: "smooth",
-                                                });
-                                                setFormPurpose("Simpan");
-                                                setShowPaket(!showPaket);
-                                                setPaketItem({
-                                                    ...paketItem,
-                                                    id_jenjang: item.id,
-                                                });
-                                            }}
-                                        >
-                                            <i class="fa-solid fa-plus"></i>{" "}
-                                            Tambah Paket
-                                        </button>
-                                        <button
-                                            className="h-full w-1/3 py-1 md:py-0 rounded-md border border-abu-bs hover:bg-abu-bs hover:border-black hover:text-white"
-                                            onClick={() => {
-                                                handleEditJenjang(item.id);
-                                            }}
-                                        >
-                                            <i class="fa-solid fa-pen-to-square"></i>{" "}
-                                            Edit Jenjang
-                                        </button>
-                                        <button
-                                            className="h-full w-1/3 py-1 md:py-0 bg-merah-bs text-white rounded-md border border-abu-bs"
-                                            onClick={() =>
-                                                handleHapusJenjang(item.id)
-                                            }
-                                        >
-                                            <i class="fa-solid fa-trash-can"></i>{" "}
-                                            Hapus Jenjang
-                                        </button>
-                                    </div>
-                                </div>
+                              <div
+                                  className="w-full h-[40vh] flex flex-col my-4"
+                                  key={item.id}
+                              >
+                                  <div className="w-full md:h-[10%] flex flex-col md:flex-row items-start md:items-center mb-2">
+                                      <h1 className="text-2xl w-fit md:w-3/5 h-full font-bold text-black/80 opacity-80">
+                                          {item.nama_jenjang}
+                                      </h1>
+                                      <div className="w-full md:w-2/5 h-full flex gap-2">
+                                          <button
+                                              className="h-full w-1/3 py-1 md:py-0 rounded-md border border-abu-bs hover:bg-abu-bs hover:border-black hover:text-white"
+                                              onClick={() => {
+                                                  // Scroll Ke atas
+                                                  window.scrollTo({
+                                                      top: 0,
+                                                      behavior: "smooth",
+                                                  });
+                                                  setFormPurpose("Simpan");
+                                                  setShowPaket(!showPaket);
+                                                  setPaketItem({
+                                                      ...paketItem,
+                                                      id_jenjang: item.id,
+                                                  });
+                                              }}
+                                          >
+                                              <i class="fa-solid fa-plus"></i>{" "}
+                                              Tambah Paket
+                                          </button>
+                                          <button
+                                              className="h-full w-1/3 py-1 md:py-0 rounded-md border border-abu-bs hover:bg-abu-bs hover:border-black hover:text-white"
+                                              onClick={() => {
+                                                  handleEditJenjang(item.id);
+                                              }}
+                                          >
+                                              <i class="fa-solid fa-pen-to-square"></i>{" "}
+                                              Edit Jenjang
+                                          </button>
+                                          <button
+                                              className="h-full w-1/3 py-1 md:py-0 bg-merah-bs text-white rounded-md border border-abu-bs"
+                                              onClick={() =>
+                                                  handleHapusJenjang(item.id)
+                                              }
+                                          >
+                                              <i class="fa-solid fa-trash-can"></i>{" "}
+                                              Hapus Jenjang
+                                          </button>
+                                      </div>
+                                  </div>
 
-                                <div className="h-[90%] w-full flex flex-col flex-wrap overflow-auto gap-4">
-                                    {/* Looping Section Paket dalam Jenjang */}
-                                    {paketBimbingan.filter(
-                                        (paket) =>
-                                            paket.id_jenjang === item.id
-                                    ).length === 0
-                                        ? "Tidak ada Paket Bimbingan"
-                                        : paketBimbingan
-                                            .filter(
-                                                (paket) =>
-                                                    paket.id_jenjang ===
-                                                    item.id
-                                            )
-                                            .map((hasil) => (
-                                                <div
-                                                    className="w-5/6 md:w-1/3 h-full border border-abu-bs p-2 rounded-md flex flex-col relative group" onClick={(e) => {
-                                                        setShowGroup(!showGroup);
-                                                        setIdPaket(parseInt(hasil.id))
-                                                }}>
-                                                    <div className="flex justify-center h-full">
-                                                        <img
-                                                            src="images/logo-paket.jpg"
-                                                            alt=""
-                                                            className="h-full object-cover group-hover:blur-sm"
-                                                        />
-                                                    </div>
+                                  <div className="h-[90%] w-full flex flex-col flex-wrap overflow-auto gap-4">
+                                      {/* Looping Section Paket dalam Jenjang */}
+                                      {paketBimbingan.filter(
+                                          (paket) =>
+                                              paket.id_jenjang === item.id
+                                      ).length === 0
+                                          ? "Tidak ada Paket Bimbingan"
+                                          : paketBimbingan
+                                                .filter(
+                                                    (paket) =>
+                                                        paket.id_jenjang ===
+                                                        item.id
+                                                )
+                                                .map((hasil) => (
                                                     <div
-                                                        className="min-h-1/5 w-full absolute bottom-0 left-0 p-2 flex items-center">
-                                                        <div className="description w-11/12">
-                                                            <h1 className="font-bold text-lg w-fit bg-merah-bs rounded-md text-white px-2">
-                                                                {
-                                                                    hasil.nama_paket
-                                                                }
-                                                            </h1>
-                                                            <p className="hidden group-hover:block">
-                                                                Rp.{" "}
-                                                                {
-                                                                    hasil.harga
-                                                                }
-                                                            </p>
+                                                        className="w-5/6 md:w-1/3 h-full border border-abu-bs p-2 rounded-md flex flex-col relative group"
+                                                        onClick={(e) => {
+                                                            setIdPaket(
+                                                                parseInt(
+                                                                    hasil.id
+                                                                )
+                                                            );
+                                                        }}
+                                                    >
+                                                        <div className="flex justify-center h-full">
+                                                            <img
+                                                                src="images/logo-paket.jpg"
+                                                                alt=""
+                                                                className="h-full object-cover group-hover:blur-sm"
+                                                            />
                                                         </div>
-                                                        <div
-                                                            className="detail w-1/12 p-2 border rounded-r-md bg-merah-bs text-white">
-                                                            <i className="fa-solid fa-chevron-right"></i>
+                                                        <div className="min-h-1/5 w-full absolute bottom-0 left-0 p-2 flex items-center">
+                                                            <div className="description w-11/12">
+                                                                <h1 className="font-bold text-lg w-fit bg-merah-bs rounded-md text-white px-2">
+                                                                    {
+                                                                        hasil.nama_paket
+                                                                    }
+                                                                </h1>
+                                                                <p className="hidden group-hover:block">
+                                                                    Rp.{" "}
+                                                                    {
+                                                                        hasil.harga
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                            <div className="detail w-1/12 p-2 border rounded-r-md bg-merah-bs text-white">
+                                                                <i className="fa-solid fa-chevron-right"></i>
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div
-                                                        className="min-h-1/5 w-full absolute top-0 left-0 p-2 flex justify-end gap-2">
-                                                        <button
-                                                            className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
-                                                            onClick={() => {
-                                                                setIdPaket(0)
-                                                                setShowGroup(!showGroup)
-                                                            }
-                                                            }
-                                                        >
-                                                            <i class="fa-solid fa-plus text-lg"></i>
-                                                            <span className="hidden ">
+                                                        <div className="min-h-1/5 w-full absolute top-0 left-0 p-2 flex justify-end gap-2">
+                                                            <button
+                                                                className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
+                                                                onClick={() => {
+                                                                    setIdPaket(
+                                                                        parseInt(
+                                                                            hasil.id
+                                                                        )
+                                                                    );
+                                                                    setShowGroup(
+                                                                        !showGroup
+                                                                    );
+                                                                }}
+                                                            >
+                                                                <i class="fa-solid fa-plus text-lg"></i>
+                                                                <span className="hidden ">
                                                                     Tambah Grup
                                                                 </span>
-                                                        </button>
-                                                        <button
-                                                            className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
-                                                            onClick={() =>
-                                                                handleEditPaket(
-                                                                    hasil.id
-                                                                )
-                                                            }
-                                                        >
-                                                            <i class="fa-solid fa-pen-to-square text-lg"></i>
-                                                        </button>
-                                                        <button
-                                                            className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
-                                                            onClick={() =>
-                                                                handleHapusPaket(
-                                                                    hasil.id
-                                                                )
-                                                            }
-                                                        >
-                                                            <i class="fa-solid fa-trash-can text-lg"></i>
-                                                        </button>
+                                                            </button>
+                                                            <button
+                                                                className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
+                                                                onClick={() =>
+                                                                    handleEditPaket(
+                                                                        hasil.id
+                                                                    )
+                                                                }
+                                                            >
+                                                                <i class="fa-solid fa-pen-to-square text-lg"></i>
+                                                            </button>
+                                                            <button
+                                                                className="border px-1 bg-merah-bs text-white hidden rounded-md group-hover:block"
+                                                                onClick={() =>
+                                                                    handleHapusPaket(
+                                                                        hasil.id
+                                                                    )
+                                                                }
+                                                            >
+                                                                <i class="fa-solid fa-trash-can text-lg"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
-                                </div>
-                            </div>
-                        ))}
+                                                ))}
+                                  </div>
+                              </div>
+                          ))}
                 </div>
             </div>
-            <FormJenjang handleTambahEditJenjang={handleTambahEditJenjang}/>
-            <FormPaket handleTambahEditPaket={handleTambahEditPaket}/>
-            <FormGrup showGroup={showGroup} setShowGroup={setShowGroup} idPaket={idPaket} setIdPaket={setIdPaket}/>
+            <FormJenjang handleTambahEditJenjang={handleTambahEditJenjang} />
+            <FormPaket handleTambahEditPaket={handleTambahEditPaket} />
+            <FormGrup
+                showGroup={showGroup}
+                setShowGroup={setShowGroup}
+                idPaket={idPaket}
+                setIdPaket={setIdPaket}
+            />
         </>
     );
 }
