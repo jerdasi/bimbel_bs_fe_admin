@@ -47,7 +47,7 @@ export default function TableTestimoni() {
     // Id 0 artinya post, selain itu edit/update
     const handleTestimoni = (testimoniBaru, id = 0) => {
         if (id == 0) {
-            setTestimoni([...testimoni, convertToDataTable(testimoniBaru)]);
+            setTestimoni([...testimoni]);
             // console.log(convertToDataTable(testimoniBaru));
         } else {
             let hasil = testimoni.findIndex((item) => item.id == id);

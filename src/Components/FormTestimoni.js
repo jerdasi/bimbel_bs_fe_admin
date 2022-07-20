@@ -8,6 +8,7 @@ export default function FormTestimoni({
     showForm,
     setShowForm,
     handleTestimoni,
+    setTestimoni,
 }) {
     const [siswa, setSiswa] = useState([]);
     const [pendaftaran, setPendaftaran] = useState([]);
@@ -83,11 +84,9 @@ export default function FormTestimoni({
             .post(`${process.env.REACT_APP_API}/testimoni`, formData)
             .then((res) => {
                 axios
-                    .get(
-                        `${process.env.REACT_APP_API}/testimoni/${res.data.data.id}`
-                    )
+                    .get(`${process.env.REACT_APP_API}/testimoni`)
                     .then((res) => {
-                        handleTestimoni(res.data.data);
+                        setTestimoni(res.data.data);
                         Swal.fire(
                             "Berhasil",
                             "Testimoni Baru Berhasil Ditambahkan!",
@@ -96,13 +95,13 @@ export default function FormTestimoni({
                     });
                 // handleTestimoni(res.data.data);
             });
-        handleShow();
+        setShowForm(false);
         // console.log(formData)
     };
 
     return (
         <div className="">
-            <div className="w-1/2 md:w-1/6 inline fixed bottom-20 md:bottom-10 right-4 md:right-10 flex justify-end">
+            <div className="w-1/2 md:w-1/6 fixed bottom-20 md:bottom-10 right-4 md:right-10 flex justify-end">
                 <button
                     className="w-5/6 bg-merah-bs text-white rounded-lg text-lg flex items-center justify-center p-2"
                     onClick={handleShow}

@@ -10,6 +10,7 @@ export default function TableSiswa() {
     const [peserta, setPeserta] = useState([]);
     const [dataTabel, setDataTabel] = useState([]);
     const [jenjang, setJenjang] = useState([]);
+    const [sukses, setSukses] = useState([]);
     const [singlePeserta, setSinglePeserta] = useState({
         nama: "",
         tempat: "",
@@ -35,6 +36,9 @@ export default function TableSiswa() {
         axios
             .get(`${process.env.REACT_APP_API}/peserta-didik`)
             .then((res) => setPeserta(res.data.data));
+        axios
+            .get(`${process.env.REACT_APP_API}/pendaftaran/pendaftaran-sukses`)
+            .then((res) => setSukses(res.data.data));
     }, []);
 
     // handleTambahEditPeserta
@@ -90,8 +94,27 @@ export default function TableSiswa() {
         });
     };
 
+    // Untuk mengecek apakah siswa aktif atau tidak dengan melihat paket yang dibayar terbaru  apakah sudah sudah melewati 1 bulan setelah pendaftaran
+    const checkActiveOrNot = (id, tanggal) => {
+        // console.log(id);
+        let index = sukses.findIndex((item) => item.id_siswa == id);
+        if (index != -1) {
+            if (
+                moment().format() <=
+                moment(sukses[index].tanggal_pendaftaran).add(1, "M").format()
+            ) {
+                return "Aktif";
+            } else {
+                return "Tidak Aktif";
+            }
+        } else {
+            return "Tidak Aktif";
+        }
+    };
+
     const convertToDataTable = (data) => {
         return data.map((item, index) => {
+            // checkActiveOrNot(item.id);
             return {
                 id: index,
                 id_peserta: item.id,
@@ -108,7 +131,7 @@ export default function TableSiswa() {
                 "Telepon Anak": item.telepon_anak,
                 "Telepon Ayah": item.telepon_ayah,
                 "Telepon Ibu": item.telepon_ibu,
-                Status: item.id_grup ? "Aktif" : "Tidak Aktif",
+                Status: checkActiveOrNot(item.id),
             };
         });
     };
