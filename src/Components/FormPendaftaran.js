@@ -7,8 +7,10 @@ import Swal from "sweetalert2";
 export default function FormPendaftaran({
     setDataPendaftaran,
     dataPendaftaran,
+    show,
+    setShow,
+    pendaftar,
 }) {
-    const [show, setShow] = useState(false);
     const [siswa, setSiswa] = useState([]);
     const [paket, setPaket] = useState([]);
     const [grup, setGrup] = useState([]);
@@ -62,6 +64,9 @@ export default function FormPendaftaran({
         axios
             .get(`${process.env.REACT_APP_API}/guru`)
             .then((res) => setGuru(res.data.data));
+
+        // Jika ada ngirim data berupa id dari parent
+        // if()
 
         // Ini Terjadi Ketika Mengklik Sebuah Paket Bimbingan
         if (formPendaftaran.id_paket != 0) {

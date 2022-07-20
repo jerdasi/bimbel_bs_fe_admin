@@ -8,6 +8,7 @@ import moment from "moment";
 
 export default function TablePendaftaran() {
     const [dataPendaftaran, setDataPendaftaran] = useState([]);
+    const [show, setShow] = useState(false);
     const [pendaftar, setPendaftar] = useState({});
     const [jenjang, setJenjang] = useState([]);
     const [siswa, setSiswa] = useState([]);
@@ -87,6 +88,14 @@ export default function TablePendaftaran() {
                 return (
                     <div className="w-full h-fit flex justify-center gap-3">
                         <button
+                            className="p-2 border border-black rounded-md w-fit"
+                            onClick={(e) =>
+                                updatePendaftaran(params.row.id_pendaftaran)
+                            }
+                        >
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button
                             className="p-2 bg-merah-bs text-white rounded-md border border-merah-bs w-fit"
                             onClick={(e) =>
                                 hapusPendaftaran(params.row.id_pendaftaran)
@@ -109,11 +118,17 @@ export default function TablePendaftaran() {
                 id_jenjang: item.id_jenjang,
                 NamaPaket: item.nama_paket,
                 NamaGrup: item.nama_grup,
-                TanggalPendaftaran: item.tanggal_pendaftaran,
+                TanggalPendaftaran: moment(item.tanggal_pendaftaran).format(
+                    "DD-MM-YYYY"
+                ),
                 TotalPembayaran: item.total_pembayaran,
                 status: item.status,
             };
         });
+    };
+
+    const updatePendaftaran = (id) => {
+        console.log(dataPendaftaran.filter((item) => item.id == id));
     };
 
     const hapusPendaftaran = (id) => {
@@ -237,6 +252,9 @@ export default function TablePendaftaran() {
                 <FormPendaftaran
                     setDataPendaftaran={setDataPendaftaran}
                     dataPendaftaran={dataPendaftaran}
+                    pendaftar={pendaftar}
+                    show={show}
+                    setShow={setShow}
                 />
             </div>
         </>
