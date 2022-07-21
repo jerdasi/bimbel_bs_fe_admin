@@ -21,6 +21,9 @@ export default function TableTestimoni() {
     });
     const [showForm, setShowForm] = useState(false);
 
+    const [pendaftaran, setPendaftaran] = useState([]);
+    const [filterPendaftaran, setFilterPendaftaran] = useState([]);
+
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API}/peserta-didik`).then((res) => {
             setSiswa([...res.data.data]);
@@ -41,7 +44,30 @@ export default function TableTestimoni() {
         axios.get(`${process.env.REACT_APP_API}/testimoni`).then((res) => {
             setTestimoni([...res.data.data]);
         });
+        getSiswaPendaftaranSukses();
     }, []);
+
+    const getSiswaPendaftaranSukses = () => {
+        let nama_siswa = [];
+        axios.get(`${process.env.REACT_APP_API}/peserta-didik`).then((res) => {
+            nama_siswa = [...res.data.data];
+            setSiswa([...res.data.data]);
+        });
+        axios
+            .get(`${process.env.REACT_APP_API}/testimoni/pendaftaran`)
+            .then((res) => {
+                let hasil = res.data.data.map((item) => {
+                    return {
+                        ...item,
+                        nama: nama_siswa.filter((s) => s.id == item.id_siswa)[0]
+                            ?.nama,
+                    };
+                });
+                console.log(hasil);
+                setPendaftaran([...hasil]);
+                setFilterPendaftaran([...hasil]);
+            });
+    };
 
     // handleTambahEditPeserta
     // Id 0 artinya post, selain itu edit/update
@@ -51,9 +77,11 @@ export default function TableTestimoni() {
             // console.log(convertToDataTable(testimoniBaru));
         } else {
             let hasil = testimoni.findIndex((item) => item.id == id);
-            let tempTestimoni = [...guru];
+            let tempTestimoni = [...testimoni];
             tempTestimoni[hasil] = testimoniBaru;
-            setGuru([...tempTestimoni]);
+            setTestimoni([...tempTestimoni]);
+            Swal.fire("Berhasil", "Testimoni Berhasil Diperbarui!", "success");
+            setSingleTestimoni({});
         }
     };
 
@@ -63,6 +91,7 @@ export default function TableTestimoni() {
         let testimoni_update = testimoni.find((el) => el.id == id);
         setShowForm(!showForm);
         setSingleTestimoni(testimoni_update);
+        console.log(testimoni_update);
     };
 
     // handleHapusTestimoni
@@ -80,13 +109,14 @@ export default function TableTestimoni() {
             if (result.isConfirmed) {
                 axios
                     .delete(`${process.env.REACT_APP_API}/testimoni/${id}`)
-                    .then((res) =>
+                    .then((res) => {
                         setTestimoni(
                             testimoni.filter(
                                 (item) => item.id != res.data.data.id
                             )
-                        )
-                    );
+                        );
+                        getSiswaPendaftaranSukses();
+                    });
             }
         });
     };
@@ -95,6 +125,7 @@ export default function TableTestimoni() {
         return data.map((item, index) => {
             return {
                 id: index,
+                id_testimoni: item.id,
                 id_siswa: item.id_siswa,
                 nama_siswa: siswa.filter((s) => s.id == item.id_siswa)[0]?.nama,
                 id_grup: item.id_grup,
@@ -191,6 +222,13 @@ export default function TableTestimoni() {
                 showForm={showForm}
                 testimoni={testimoni}
                 setTestimoni={setTestimoni}
+                singleTestimoni={singleTestimoni}
+                pendaftaran={pendaftaran}
+                setPendaftaran={setPendaftaran}
+                filterPendaftaran={filterPendaftaran}
+                setFilterPendaftaran={setFilterPendaftaran}
+                getSiswaPendaftaranSukses={getSiswaPendaftaranSukses}
+                siswa={siswa}
             />
         </>
     );

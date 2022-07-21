@@ -180,7 +180,7 @@ export default function FormPendaftaran({
                 (item) => item.id == formPendaftaran.id_paket
             )[0]?.jumlah_pertemuan;
             let checkJadwal = [...new Set(convertToIdHariJam())];
-            if (checkJadwal == jumlah_pertemuan) {
+            if (checkJadwal.length == jumlah_pertemuan) {
                 let panjang = grup.filter(
                     (item) => item.id_paket == formPendaftaran.id_paket
                 ).length;
@@ -267,6 +267,8 @@ export default function FormPendaftaran({
                             });
                     });
             } else {
+                console.log(jumlah_pertemuan);
+                console.log([...new Set(convertToIdHariJam())]);
                 Swal.fire("Gagal", "Jadwal Pertemuan Ada Yang Double", "error");
             }
 

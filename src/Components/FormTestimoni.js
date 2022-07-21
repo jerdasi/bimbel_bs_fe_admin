@@ -9,10 +9,16 @@ export default function FormTestimoni({
     setShowForm,
     handleTestimoni,
     setTestimoni,
+    pendaftaran,
+    setPendaftaran,
+    filterPendaftaran,
+    setFilterPendaftaran,
+    getSiswaPendaftaranSukses,
+    singleTestimoni,
+    siswa,
 }) {
-    const [siswa, setSiswa] = useState([]);
-    const [pendaftaran, setPendaftaran] = useState([]);
-    const [filterPendaftaran, setFilterPendaftaran] = useState([]);
+    // const [siswa, setSiswa] = useState([]);
+
     const [filterTool, setFilterTool] = useState({
         nama_siswa: "",
     });
@@ -22,32 +28,28 @@ export default function FormTestimoni({
     });
 
     useEffect(() => {
-        let nama_siswa = [];
-        axios.get(`${process.env.REACT_APP_API}/peserta-didik`).then((res) => {
-            nama_siswa = [...res.data.data];
-            setSiswa([...res.data.data]);
-        });
-        axios
-            .get(`${process.env.REACT_APP_API}/testimoni/pendaftaran`)
-            .then((res) => {
-                let hasil = res.data.data.map((item) => {
-                    return {
-                        ...item,
-                        nama: nama_siswa.filter((s) => s.id == item.id_siswa)[0]
-                            ?.nama,
-                    };
-                });
-                console.log(hasil);
-                setPendaftaran([...hasil]);
-                setFilterPendaftaran([...hasil]);
-            });
+        getSiswaPendaftaranSukses();
         searchTool("");
-    }, []);
+        if (singleTestimoni.id) {
+            console.log("Jalan Edit");
+            setFormData({
+                ...singleTestimoni,
+            });
+            setFilterTool({
+                nama_siswa: siswa.filter(
+                    (item) => item.id == singleTestimoni.id_siswa
+                )[0]?.nama,
+            });
+        }
+    }, [singleTestimoni]);
 
     const resetFormData = () => {
         setFormData({
             id_pendaftaran: 0,
             deskripsi: "",
+        });
+        setFilterTool({
+            nama_siswa: "",
         });
     };
 
@@ -87,16 +89,24 @@ export default function FormTestimoni({
                     .get(`${process.env.REACT_APP_API}/testimoni`)
                     .then((res) => {
                         setTestimoni(res.data.data);
+                        resetFormData();
                         Swal.fire(
                             "Berhasil",
                             "Testimoni Baru Berhasil Ditambahkan!",
                             "success"
                         );
+                        getSiswaPendaftaranSukses();
                     });
                 // handleTestimoni(res.data.data);
             });
-        setShowForm(false);
+        handleShow();
         // console.log(formData)
+    };
+
+    const updateTestimoni = (e) => {
+        e.preventDefault();
+        handleTestimoni(formData, formData.id);
+        handleShow();
     };
 
     return (
@@ -241,12 +251,22 @@ export default function FormTestimoni({
                             </div>
                         </div>
                         <div className="footer-form w-full h-[10%] flex items-center justify-end bg-biru-bs p-4">
-                            <button
-                                className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
-                                onClick={(e) => tambahTestimoni(e)}
-                            >
-                                Simpan
-                            </button>
+                            {!formData.id && (
+                                <button
+                                    className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
+                                    onClick={(e) => tambahTestimoni(e)}
+                                >
+                                    Simpan
+                                </button>
+                            )}
+                            {formData.id && (
+                                <button
+                                    className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
+                                    onClick={(e) => updateTestimoni(e)}
+                                >
+                                    Edit
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>
