@@ -1,4 +1,5 @@
 import axios from "axios";
+import _ from "lodash";
 import moment from "moment";
 import React, { useState } from "react";
 import { useEffect } from "react";
@@ -64,6 +65,12 @@ export default function FormPendaftaran({
         axios
             .get(`${process.env.REACT_APP_API}/guru`)
             .then((res) => setGuru(res.data.data));
+        axios
+            .get(`${process.env.REACT_APP_API}/hari`)
+            .then((res) => setHari(res.data.data));
+        axios
+            .get(`${process.env.REACT_APP_API}/jam`)
+            .then((res) => setJam(res.data.data));
 
         // Jika ada ngirim data berupa id dari parent
         // if()
@@ -100,52 +107,185 @@ export default function FormPendaftaran({
                     `${process.env.REACT_APP_API}/waktu-guru?guru=${formPendaftaran.id_guru}`
                 )
                 .then((res) => {
-                    setJadwalGuru(res.data.data);
-                    let hari = res.data.data.map((item) => item.id_hari);
-                    let jam = res.data.data.map((item) => item.id_jam);
-                    setHariGuru([...new Set(hari)]);
-                    setJamGuru([...new Set(jam)]);
-                    // console.log([...new Set(hari)], [...new Set(jam)]);
+                    let waktu_guru = res.data.data;
+                    let jadwalGuruGrup;
+                    axios
+                        .get(
+                            `${process.env.REACT_APP_API}/jadwal-grup?guru=${formPendaftaran.id_guru}`
+                        )
+                        .then((res) => {
+                            jadwalGuruGrup = res.data.data;
+                            let jadwal_tersisa = _.differenceBy(
+                                waktu_guru,
+                                jadwalGuruGrup,
+                                "id_hari_jam"
+                            );
+                            setJadwalGuru(jadwal_tersisa);
+                            let hari = jadwal_tersisa.map(
+                                (item) => item.id_hari
+                            );
+                            let jam = jadwal_tersisa.map((item) => item.id_jam);
+                            setHariGuru([...new Set(hari)]);
+                            setJamGuru([...new Set(jam)]);
+                        });
+                    console.log(jadwalGuruGrup);
                 });
         }
     }, [formPendaftaran.id_guru, formPendaftaran.id_paket]);
 
+    // Function Merubah Id Hari dan Id Jam menjadi id_hari_jam
+    const convertToIdHariJam = () => {
+        return jadwal.map((item) => {
+            return {
+                id_hari_jam: operasional.filter(
+                    (o) => o.id_hari == item.id_hari && o.id_jam == item.id_jam
+                )[0]?.id,
+            };
+        });
+    };
+
     const daftarPeserta = (event) => {
         event.preventDefault();
-        let requestForm = {
-            ...formValue,
-            tanggal_pendaftaran: new Date(),
-            id_grup: parseInt(formValue.id_grup),
-            status: formPendaftaran.sudah_bayar ? "selesai" : "pending",
-        };
+        let requestForm;
 
         if (jenisPaket.kuota != null) {
-            //Buat Grup
-            //Daftar
-        } else {
-            axios
-                .post(`${process.env.REACT_APP_API}/pendaftaran`, requestForm)
-                .then((res) => {
-                    console.log(res.data.data.id);
-                    //Manggil Secara Manual Biar Data nya Penuh
-                    axios
-                        .get(
-                            `${process.env.REACT_APP_API}/pendaftaran/${res.data.data.id}`
-                        )
-                        .then((has) => {
-                            setDataPendaftaran([
-                                ...dataPendaftaran,
-                                ...has.data.data,
-                            ]);
-                            Swal.fire(
-                                "Berhasil",
-                                "Berhasil Mendaftarkan Peserta Didik Baru",
-                                "success"
-                            );
+            // console.log(jadwal);
+            //Tahapan Jika dia Private
+            // Membuat Grup (Guru daan Jadwal Pertemuan)
+            // Kemudian Daftar
+            let jumlah_pertemuan = paket.filter(
+                (item) => item.id == formPendaftaran.id_paket
+            )[0]?.jumlah_pertemuan;
+            let checkJadwal = [...new Set(convertToIdHariJam())];
+            if (checkJadwal == jumlah_pertemuan) {
+                let panjang = grup.filter(
+                    (item) => item.id_paket == formPendaftaran.id_paket
+                ).length;
+                // Membuat Nama Grup Dengan Mengambil Nama Paket dan Jenjang
+                let nama_paket = paket.filter(
+                    (item) => item.id == formPendaftaran.id_paket
+                )[0]?.nama_paket;
+                let nama_jenjang = jenjang.filter(
+                    (item) => item.id == formPendaftaran.id_jenjang
+                )[0]?.nama_jenjang;
+                let nama_grup = `${nama_jenjang}-${nama_paket}-${panjang + 1}`;
+                // console.log(nama_grup);
+
+                // Membuat Grup
+                axios
+                    .post(`${process.env.REACT_APP_API}/grup-bimbel`, {
+                        nama_grup: nama_grup,
+                        id_paket: formPendaftaran.id_paket,
+                        id_guru: formPendaftaran.id_guru,
+                        kuota: 1,
+                    })
+                    .then((res) => {
+                        // console.log(id_grup)
+                        // Hasil Daftar Grup Masukkan ID ke State FormValue
+                        setFormValue({
+                            ...formValue,
+                            id_grup: parseInt(res.data.data.id),
                         });
 
-                    handleShow();
-                });
+                        requestForm = {
+                            ...formValue,
+                            tanggal_pendaftaran: new Date(),
+                            id_grup: res.data.data.id,
+                            status: formPendaftaran.sudah_bayar
+                                ? "selesai"
+                                : "pending",
+                        };
+                        let daftarJadwal = {
+                            id_grup: parseInt(res.data.data.id),
+                            jadwal: convertToIdHariJam(),
+                        };
+                        console.log(daftarJadwal);
+                        axios
+                            .post(
+                                `${process.env.REACT_APP_API}/jadwal-grup`,
+                                daftarJadwal
+                            )
+                            .then((res) =>
+                                Swal.fire(
+                                    "Berhasil",
+                                    "Berhasil Menambahkan Jadwal",
+                                    "success"
+                                )
+                            )
+                            .catch(() => console.log("Gagal Mendaftar Jadwal"));
+
+                        axios
+                            .post(
+                                `${process.env.REACT_APP_API}/pendaftaran`,
+                                requestForm
+                            )
+                            .then((res) => {
+                                axios
+                                    .get(
+                                        `${process.env.REACT_APP_API}/pendaftaran/${res.data.data.id}`
+                                    )
+                                    .then((has) => {
+                                        setDataPendaftaran([
+                                            ...dataPendaftaran,
+                                            ...has.data.data,
+                                        ]);
+                                        Swal.fire(
+                                            "Berhasil",
+                                            "Berhasil Mendaftarkan Peserta Didik Baru",
+                                            "success"
+                                        );
+                                    });
+                            });
+                    });
+            } else {
+                Swal.fire("Gagal", "Jadwal Pertemuan Ada Yang Double", "error");
+            }
+
+            //Daftar
+        } else {
+            requestForm = {
+                ...formValue,
+                tanggal_pendaftaran: new Date(),
+                id_grup: formValue.id_grup,
+                status: formPendaftaran.sudah_bayar ? "selesai" : "pending",
+            };
+            if (
+                formValue.id_siswa != -1 &&
+                formValue.id_grup != -1 &&
+                formValue.total_pembayaran != 0
+            ) {
+                axios
+                    .post(
+                        `${process.env.REACT_APP_API}/pendaftaran`,
+                        requestForm
+                    )
+                    .then((res) => {
+                        console.log(res.data.data.id);
+                        //Manggil Secara Manual Biar Data nya Penuh
+                        axios
+                            .get(
+                                `${process.env.REACT_APP_API}/pendaftaran/${res.data.data.id}`
+                            )
+                            .then((has) => {
+                                setDataPendaftaran([
+                                    ...dataPendaftaran,
+                                    ...has.data.data,
+                                ]);
+                                Swal.fire(
+                                    "Berhasil",
+                                    "Berhasil Mendaftarkan Peserta Didik Baru",
+                                    "success"
+                                );
+                            });
+                        handleShow();
+                    });
+            } else {
+                Swal.fire(
+                    "Gagal",
+                    "Data tidak lengkap! Harap lengkapi terlebih dahulu",
+                    "error"
+                );
+            }
         }
 
         //Ini Jika Ga buat Grup Baru
@@ -412,6 +552,15 @@ export default function FormPendaftaran({
                                                 setFormValue({
                                                     ...formValue,
                                                     id_grup: -1,
+                                                    total_pembayaran:
+                                                        paket.filter(
+                                                            (item) =>
+                                                                item.id ==
+                                                                parseInt(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                        )[0]?.harga,
                                                 });
                                             }}
                                             value={formPendaftaran.id_paket}
@@ -465,12 +614,6 @@ export default function FormPendaftaran({
                                                     id_grup: parseInt(
                                                         e.target.value
                                                     ),
-                                                    total_pembayaran:
-                                                        paket.filter(
-                                                            (item) =>
-                                                                item.id ==
-                                                                formPendaftaran.id_paket
-                                                        )[0]?.harga,
                                                 });
                                             }}
                                             value={formPendaftaran.id_grup}
@@ -501,7 +644,12 @@ export default function FormPendaftaran({
                                 <div className="row mb-6">
                                     <div className="row mb-3 w-full">
                                         <div className="title mb-1">
-                                            <p>Guru</p>
+                                            <p className="font-bold">
+                                                Tentukan Guru{" "}
+                                                <span className="text-merah-bs">
+                                                    *
+                                                </span>
+                                            </p>
                                         </div>
                                         <div className="w-full h-48 flex flex-col flex-wrap overflow-auto hide-scrollbar box-border">
                                             {guru.map((item) => (
@@ -509,18 +657,18 @@ export default function FormPendaftaran({
                                                     className={[
                                                         "h-full w-3/5 md:w-1/3 border border-biru-bs rounded-md mr-2 flex justify-center relative group",
                                                         item.id ==
-                                                        formValue.id_guru
+                                                        formPendaftaran.id_guru
                                                             ? "shadow border-2 border-merah-bs"
                                                             : "",
                                                     ].join(" ")}
-                                                    onClick={(e) =>
-                                                        setFormValue({
-                                                            ...formValue,
+                                                    onClick={(e) => {
+                                                        setFormPendaftaran({
+                                                            ...formPendaftaran,
                                                             id_guru: parseInt(
                                                                 item.id
                                                             ),
-                                                        })
-                                                    }
+                                                        });
+                                                    }}
                                                 >
                                                     <img
                                                         src={`${process.env.REACT_APP_API}/${item.foto}`}
@@ -537,7 +685,7 @@ export default function FormPendaftaran({
 
                                     <div className="title font-bold mt-8 mb-1">
                                         <p>
-                                            Atur Jadwal Grup{" "}
+                                            Atur Hari dan Jam Pertemuan{" "}
                                             <span className="text-merah-bs">
                                                 *
                                             </span>
@@ -582,7 +730,7 @@ export default function FormPendaftaran({
                                                                     (h) =>
                                                                         h.id ==
                                                                         item
-                                                                )[0].nama_hari
+                                                                )[0]?.nama_hari
                                                             }
                                                         </option>
                                                     ))}

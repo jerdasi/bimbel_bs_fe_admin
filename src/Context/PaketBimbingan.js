@@ -14,6 +14,10 @@ export const PaketProvider = (props) => {
         jumlah_pertemuan: 0,
         deskripsi: "",
         harga: 0,
+        kuota: null,
+        min_nilai: 0,
+        riwayat_ranking: 0,
+        fasilitas_ujian: 0,
     });
     const [showJenjang, setShowJenjang] = useState(false);
     const [showPaket, setShowPaket] = useState(false);

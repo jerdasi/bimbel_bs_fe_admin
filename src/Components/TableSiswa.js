@@ -5,6 +5,7 @@ import PreviewPhoto from "./SmartComponent/PreviewPhoto";
 import FormSiswa from "./FormSiswa";
 import moment from "moment";
 import Swal from "sweetalert2";
+import _ from "lodash";
 
 export default function TableSiswa() {
     const [peserta, setPeserta] = useState([]);
@@ -14,7 +15,7 @@ export default function TableSiswa() {
     const [singlePeserta, setSinglePeserta] = useState({
         nama: "",
         tempat: "",
-        tanggal_lahir: moment().format("DD-MM-YYYY"),
+        tanggal_lahir: moment().format("yyyy-MM-DD"),
         alamat: "",
         id_jenjang: 0,
         asal_sekolah: "",
@@ -44,8 +45,10 @@ export default function TableSiswa() {
     // handleTambahEditPeserta
     // Id 0 artinya post, selain itu edit/update
     const handlePeserta = (pesertaBaru, id = 0) => {
+        let hasil = [...peserta, pesertaBaru];
+        hasil = _.orderBy(hasil, (a) => moment(a.createdAt), "desc");
         if (id == 0) {
-            setPeserta([...peserta, pesertaBaru]);
+            setPeserta([...hasil]);
         } else {
             let hasil = peserta.findIndex((item) => item.id == id);
             let tempPeserta = [...peserta];

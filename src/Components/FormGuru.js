@@ -14,14 +14,15 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
     const [formData, setFormData] = useState(guru);
     const [pilihanOperasional, setPilihanOperasional] = useState([]);
     const [filterHari, setFilterHari] = useState("all");
+    const [grupGuru, setGrupGuru] = useState([]);
 
     const handleShow = () => {
         console.log(show);
         setGuru({
             nama: "",
             tempat: "",
-            tanggal_lahir: moment().format("DD-MM-YYYY"),
-            pendidikan_terakhir: "",
+            tanggal_lahir: moment().format("yyyy-MM-DD"),
+            pendidikan_terakhir: 0,
             fotoGuru: null,
             alamat: "",
             telepon: "",
@@ -32,57 +33,68 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
 
     // Function Tambah Guru Baru
     const tambahGuru = (event) => {
-        console.log("Jalan");
         event.preventDefault();
-        // delete formData["id_kelas"];
+
         const config = {
             headers: { "Content-Type": "multipart/form-data" },
         };
-        let form_data = new FormData();
-        for (let key in formData) {
-            form_data.append(key, formData[key]);
+        if (
+            formData.nama != "" &&
+            formData.tempat != "" &&
+            formData.pendidikan_terakhir != 0 &&
+            formData.fotoGuru != null &&
+            formData.telepon != "" &&
+            formData.motivasi_mengajar != ""
+        ) {
+            let form_data = new FormData();
+            for (let key in formData) {
+                form_data.append(key, formData[key]);
+            }
+
+            let jadwal = pilihanOperasional
+                .map((item) => {
+                    let data;
+                    if (item.checked) {
+                        data = {
+                            id_hari_jam: item.id,
+                        };
+                    }
+                    return data;
+                })
+                .filter((notUndefined) => notUndefined !== undefined);
+
+            let jadwal_guru = {
+                id_guru: "",
+                jadwal,
+            };
+
+            axios
+                .post(`${process.env.REACT_APP_API}/guru`, form_data, config)
+                .then((res) => {
+                    handleGuru(res.data.data);
+                    console.log(res.data.data);
+                    jadwal_guru.id_guru = res.data.data.id;
+
+                    axios
+                        .post(
+                            `${process.env.REACT_APP_API}/waktu-guru`,
+                            jadwal_guru
+                        )
+                        .then((res) => {
+                            console.log(res.data);
+                            Swal.fire(
+                                "Berhasil",
+                                "Berhasil Menambah Guru dan Jadwal",
+                                "success"
+                            );
+                            setShow();
+                        })
+                        .catch((err) => console.log(err));
+                })
+                .catch((err) => console.log(err));
+        } else {
+            Swal.fire("Gagal", "Harap Lengkapi Data Terlebih Dahulu!", "error");
         }
-        let jadwal = pilihanOperasional
-            .map((item) => {
-                let data;
-                if (item.checked) {
-                    data = {
-                        id_hari_jam: item.id,
-                    };
-                }
-                return data;
-            })
-            .filter((notUndefined) => notUndefined !== undefined);
-        let jadwal_guru = {
-            id_guru: "",
-            jadwal,
-        };
-        // let id_guru;
-
-        axios
-            .post(`${process.env.REACT_APP_API}/guru`, form_data, config)
-            .then((res) => {
-                handleGuru(res.data.data);
-                console.log(res.data.data);
-                jadwal_guru.id_guru = res.data.data.id;
-
-                axios
-                    .post(
-                        `${process.env.REACT_APP_API}/waktu-guru`,
-                        jadwal_guru
-                    )
-                    .then((res) => {
-                        console.log(res.data);
-                        Swal.fire(
-                            "Berhasil",
-                            "Berhasil Menambah Guru dan Jadwal",
-                            "success"
-                        );
-                        setShow();
-                    })
-                    .catch((err) => console.log(err));
-            })
-            .catch((err) => console.log(err));
     };
 
     // Function Update/Edit Data Guru
@@ -126,8 +138,8 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                 setGuru({
                     nama: "",
                     tempat: "",
-                    tanggal_lahir: moment().format("DD-MM-YYYY"),
-                    pendidikan_terakhir: "",
+                    tanggal_lahir: moment().format(""),
+                    pendidikan_terakhir: 0,
                     fotoGuru: null,
                     alamat: "",
                     telepon: "",
@@ -199,6 +211,9 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
         // Jika Edit Maka Akan Menampilkan Jadwal yang telah ada
         if (guru.id) {
             // console.log(pilihanOperasional.findIndex((item) => item.id == 60));
+            axios
+                .get(`${process.env.REACT_APP_API}/grup-bimbel?guru=${guru.id}`)
+                .then((res) => setGrupGuru([...res.data.data]));
             axios
                 .get(`${process.env.REACT_APP_API}/waktu-guru?guru=${guru.id}`)
                 .then((res) => {
@@ -375,13 +390,10 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                         </p>
                                     </div>
                                     <div className="input-field">
-                                        <input
-                                            type="text"
+                                        <select
                                             name="pendidikan_terakhir"
                                             id="pendidikan_terakhir"
-                                            placeholder="S1"
                                             className="p-[11px] w-full rounded-md border border-abu-bs"
-                                            value={formData.pendidikan_terakhir}
                                             onChange={(e) =>
                                                 setFormData({
                                                     ...formData,
@@ -389,7 +401,53 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                                         e.target.value,
                                                 })
                                             }
-                                        />
+                                        >
+                                            <option
+                                                value={0}
+                                                disabled
+                                                selected={
+                                                    0 ==
+                                                    formData.pendidikan_terakhir
+                                                }
+                                            >
+                                                Pilih Salah Satu
+                                            </option>
+                                            <option
+                                                value="SMA"
+                                                selected={
+                                                    "SMA" ==
+                                                    formData.pendidikan_terakhir
+                                                }
+                                            >
+                                                SMA
+                                            </option>
+                                            <option
+                                                value="S1"
+                                                selected={
+                                                    "S1" ==
+                                                    formData.pendidikan_terakhir
+                                                }
+                                            >
+                                                S1
+                                            </option>
+                                            <option
+                                                value="S2"
+                                                selected={
+                                                    "S2" ==
+                                                    formData.pendidikan_terakhir
+                                                }
+                                            >
+                                                S2
+                                            </option>
+                                        </select>
+                                        {/* <input
+                                            type="text"
+                                            name="pendidikan_terakhir"
+                                            id="pendidikan_terakhir"
+                                            placeholder="S1"
+                                            className="p-[11px] w-full rounded-md border border-abu-bs"
+                                            value={formData.pendidikan_terakhir}
+                                        /> */}
                                     </div>
                                 </div>
                             </div>
@@ -590,6 +648,21 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                     })}
                                 </div>
                             </div>
+
+                            {formData.id && (
+                                <div className="row mb-3">
+                                    Daftar Grup Yang Diajar :{" "}
+                                    {grupGuru.length ? (
+                                        grupGuru.map((item) => (
+                                            <div className="inline-block p-2 rounded-md bg-merah-bs text-white mr-2 mb-1">
+                                                {item.nama_grup}
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p>Belum Memiliki Grup Yang Diajar</p>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <div className="footer-form w-full h-[10%] flex items-center justify-end bg-biru-bs p-4">
                             {formData.id && (

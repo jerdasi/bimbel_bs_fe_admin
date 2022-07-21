@@ -5,6 +5,7 @@ import PreviewPhoto from "./SmartComponent/PreviewPhoto";
 import FormGuru from "./FormGuru";
 import moment from "moment";
 import Swal from "sweetalert2";
+import _ from "lodash";
 
 export default function TableGuru() {
     const [guru, setGuru] = useState([]);
@@ -32,8 +33,10 @@ export default function TableGuru() {
     // handleTambahEditPeserta
     // Id 0 artinya post, selain itu edit/update
     const handleGuru = (pesertaBaru, id = 0) => {
+        let hasil = [...guru, pesertaBaru];
+        hasil = _.orderBy(hasil, (a) => moment(a.createdAt), "desc");
         if (id == 0) {
-            setGuru([...guru, pesertaBaru]);
+            setGuru([...hasil]);
         } else {
             let hasil = guru.findIndex((item) => item.id == id);
             let tempPeserta = [...guru];

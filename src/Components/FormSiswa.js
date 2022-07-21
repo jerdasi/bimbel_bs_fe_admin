@@ -17,7 +17,7 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
             setFormData({
                 nama: "",
                 tempat: "",
-                tanggal_lahir: new Date(),
+                tanggal_lahir: moment().format("yyyy-MM-DD"),
                 alamat: "",
                 id_jenjang: 0,
                 asal_sekolah: "",
