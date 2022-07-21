@@ -11,6 +11,7 @@ export default function FormPendaftaran({
     show,
     setShow,
     pendaftar,
+    setPendaftar,
 }) {
     const [siswa, setSiswa] = useState([]);
     const [paket, setPaket] = useState([]);
@@ -73,7 +74,28 @@ export default function FormPendaftaran({
             .then((res) => setJam(res.data.data));
 
         // Jika ada ngirim data berupa id dari parent
-        // if()
+        if (pendaftar.id) {
+            console.log(pendaftar);
+            setFormValue({
+                id: pendaftar.id,
+                id_siswa: pendaftar.id_siswa,
+                id_grup: pendaftar.id_grup,
+                tanggal_pendaftaran: pendaftar.tanggal_pendaftaran,
+                total_pembayaran: pendaftar.total_pembayaran,
+                status: pendaftar.status,
+            });
+            setFormPendaftaran({
+                nama_siswa: siswa.filter(
+                    (item) => item.id == pendaftar.id_siswa
+                )[0]?.nama,
+                id_jenjang: pendaftar.id_jenjang,
+                id_paket: pendaftar.id_paket,
+                id_grup: pendaftar.id_grup,
+                sudah_bayar: pendaftar.status == "selesai" ? true : false,
+                id_guru: 0,
+            });
+            console.log("Ada Paket Bos");
+        }
 
         // Ini Terjadi Ketika Mengklik Sebuah Paket Bimbingan
         if (formPendaftaran.id_paket != 0) {
@@ -100,6 +122,7 @@ export default function FormPendaftaran({
                     setGrup(res.data.data);
                 });
         }
+
         // Ini Terjadi apabila memilih seorang guru
         if (formPendaftaran.id_guru != 0) {
             axios
@@ -131,7 +154,7 @@ export default function FormPendaftaran({
                     console.log(jadwalGuruGrup);
                 });
         }
-    }, [formPendaftaran.id_guru, formPendaftaran.id_paket]);
+    }, [formPendaftaran.id_guru, formPendaftaran.id_paket, pendaftar]);
 
     // Function Merubah Id Hari dan Id Jam menjadi id_hari_jam
     const convertToIdHariJam = () => {
@@ -225,10 +248,16 @@ export default function FormPendaftaran({
                                         `${process.env.REACT_APP_API}/pendaftaran/${res.data.data.id}`
                                     )
                                     .then((has) => {
-                                        setDataPendaftaran([
+                                        let hasil = [
                                             ...dataPendaftaran,
                                             ...has.data.data,
-                                        ]);
+                                        ];
+                                        hasil = _.orderBy(
+                                            hasil,
+                                            (a) => moment(a.createdAt),
+                                            "desc"
+                                        );
+                                        setDataPendaftaran([...hasil]);
                                         Swal.fire(
                                             "Berhasil",
                                             "Berhasil Mendaftarkan Peserta Didik Baru",
@@ -267,10 +296,16 @@ export default function FormPendaftaran({
                                 `${process.env.REACT_APP_API}/pendaftaran/${res.data.data.id}`
                             )
                             .then((has) => {
-                                setDataPendaftaran([
+                                let hasil = [
                                     ...dataPendaftaran,
                                     ...has.data.data,
-                                ]);
+                                ];
+                                hasil = _.orderBy(
+                                    hasil,
+                                    (a) => moment(a.createdAt),
+                                    "desc"
+                                );
+                                setDataPendaftaran([...hasil]);
                                 Swal.fire(
                                     "Berhasil",
                                     "Berhasil Mendaftarkan Peserta Didik Baru",
@@ -289,6 +324,46 @@ export default function FormPendaftaran({
         }
 
         //Ini Jika Ga buat Grup Baru
+    };
+
+    const updatePeserta = (event) => {
+        event.preventDefault();
+        let requestForm = {
+            ...formValue,
+            status: formPendaftaran.sudah_bayar ? "selesai" : "pending",
+        };
+        console.log(requestForm);
+        axios
+            .put(
+                `${process.env.REACT_APP_API}/pendaftaran/${formValue.id}`,
+                requestForm
+            )
+            .then((res) => {
+                let hasil = dataPendaftaran.findIndex(
+                    (item) => item.id == formValue.id
+                );
+                let tempPendaftaran = [...dataPendaftaran];
+                tempPendaftaran[hasil] = res.data.data;
+                // console.log(tempPendaftaran);
+                setDataPendaftaran([...tempPendaftaran]);
+                // setDataPendaftaran([...dataPendaftaran]);
+                // console.log(dataPendaftaran);
+
+                Swal.fire(
+                    "Berhasil",
+                    "Berhasil Memperbarui Informasi Pendaftaran",
+                    "success"
+                );
+                handleShow();
+            })
+            .catch((err) => {
+                console.log(err);
+                Swal.fire(
+                    "Gagal",
+                    "Gagal Memperbarui Informasi Pendaftaran",
+                    "error"
+                );
+            });
     };
 
     const fixJadwal = (toSet) => {
@@ -330,23 +405,22 @@ export default function FormPendaftaran({
     };
 
     const handleShow = () => {
-        if (show) {
-            setFormPendaftaran({
-                nama_siswa: "",
-                id_jenjang: 0,
-                id_paket: 0,
-                id_grup: 0,
-                sudah_bayar: false,
-                id_guru: 0,
-            });
-            setFormValue({
-                id_siswa: -1,
-                id_grup: -1,
-                tanggal_pendaftaran: new Date(),
-                total_pembayaran: 0,
-                status: "pending",
-            });
-        }
+        setPendaftar({});
+        setFormPendaftaran({
+            nama_siswa: "",
+            id_jenjang: 0,
+            id_paket: 0,
+            id_grup: 0,
+            sudah_bayar: false,
+            id_guru: 0,
+        });
+        setFormValue({
+            id_siswa: -1,
+            id_grup: -1,
+            tanggal_pendaftaran: new Date(),
+            total_pembayaran: 0,
+            status: "pending",
+        });
         setShow(!show);
     };
 
@@ -386,7 +460,8 @@ export default function FormPendaftaran({
                     >
                         <div className="header-form flex items-center relative mb-2 border-b border-abu-bs h-[10%] p-4">
                             <h1 className="text-2xl font-bold text-merah-bs tracking-widest">
-                                Tambah Siswa
+                                {pendaftar.id ? "Edit" : "Tambah"} Pendaftaran
+                                Siswa
                             </h1>
                             <div
                                 className="close-button text-xl absolute top-0 right-4 cursor-pointer font-bold"
@@ -628,8 +703,16 @@ export default function FormPendaftaran({
                                             {filterGrup(
                                                 formPendaftaran.id_paket
                                             ).map((item) => (
-                                                <option value={item.id}>
-                                                    {item.nama_grup}
+                                                <option
+                                                    value={item.id}
+                                                    disabled={
+                                                        item.kuota == 0
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    {item.nama_grup} -{" "}
+                                                    {item.kuota} Tersisa
                                                 </option>
                                             ))}
                                         </select>
@@ -640,161 +723,180 @@ export default function FormPendaftaran({
                             {/* Muncul Jika Private */}
                             {paket.filter(
                                 (item) => item.id == formPendaftaran.id_paket
-                            )[0]?.kuota != null && (
-                                <div className="row mb-6">
-                                    <div className="row mb-3 w-full">
-                                        <div className="title mb-1">
-                                            <p className="font-bold">
-                                                Tentukan Guru{" "}
+                            )[0]?.kuota != null &&
+                                !pendaftar.id && (
+                                    <div className="row mb-6">
+                                        <div className="row mb-3 w-full">
+                                            <div className="title mb-1">
+                                                <p className="font-bold">
+                                                    Tentukan Guru{" "}
+                                                    <span className="text-merah-bs">
+                                                        *
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <div className="w-full h-48 flex flex-col flex-wrap overflow-auto hide-scrollbar box-border">
+                                                {guru.map((item) => (
+                                                    <div
+                                                        className={[
+                                                            "h-full w-3/5 md:w-1/3 border border-biru-bs rounded-md mr-2 flex justify-center relative group",
+                                                            item.id ==
+                                                            formPendaftaran.id_guru
+                                                                ? "shadow border-2 border-merah-bs"
+                                                                : "",
+                                                        ].join(" ")}
+                                                        onClick={(e) => {
+                                                            setFormPendaftaran({
+                                                                ...formPendaftaran,
+                                                                id_guru:
+                                                                    parseInt(
+                                                                        item.id
+                                                                    ),
+                                                            });
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={`${process.env.REACT_APP_API}/${item.foto}`}
+                                                            alt=""
+                                                            className="h-full object-cover rounded-md group-hover:blur-sm"
+                                                        />
+                                                        <div className="absolute bottom-0 left-0 rounded-b-md w-full p-2 font-bold bg-merah-bs text-white hidden group-hover:block">
+                                                            {item.nama}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="title font-bold mt-8 mb-1">
+                                            <p>
+                                                Atur Hari dan Jam Pertemuan{" "}
                                                 <span className="text-merah-bs">
                                                     *
                                                 </span>
                                             </p>
                                         </div>
-                                        <div className="w-full h-48 flex flex-col flex-wrap overflow-auto hide-scrollbar box-border">
-                                            {guru.map((item) => (
+                                        <div className="w-full h-32 overflow-auto">
+                                            {[
+                                                ...Array(
+                                                    jenisPaket.jumlah_pertemuan
+                                                ),
+                                            ].map((item, index) => (
                                                 <div
-                                                    className={[
-                                                        "h-full w-3/5 md:w-1/3 border border-biru-bs rounded-md mr-2 flex justify-center relative group",
-                                                        item.id ==
-                                                        formPendaftaran.id_guru
-                                                            ? "shadow border-2 border-merah-bs"
-                                                            : "",
-                                                    ].join(" ")}
-                                                    onClick={(e) => {
-                                                        setFormPendaftaran({
-                                                            ...formPendaftaran,
-                                                            id_guru: parseInt(
-                                                                item.id
-                                                            ),
-                                                        });
-                                                    }}
+                                                    className="w-full flex gap-2 mb-1"
+                                                    disabled={() =>
+                                                        fixJadwal(jadwal[index])
+                                                    }
                                                 >
-                                                    <img
-                                                        src={`${process.env.REACT_APP_API}/${item.foto}`}
-                                                        alt=""
-                                                        className="h-full object-cover rounded-md group-hover:blur-sm"
-                                                    />
-                                                    <div className="absolute bottom-0 left-0 rounded-b-md w-full p-2 font-bold bg-merah-bs text-white hidden group-hover:block">
-                                                        {item.nama}
-                                                    </div>
+                                                    <select
+                                                        name="hari_operasional"
+                                                        id="hari_operasional"
+                                                        className="p-2 w-2/5 rounded-md border border-abu-bs"
+                                                        onChange={(e) => {
+                                                            let result = [
+                                                                ...jadwal,
+                                                            ];
+                                                            result[index] = {
+                                                                ...result[
+                                                                    index
+                                                                ],
+                                                                id_hari:
+                                                                    parseInt(
+                                                                        e.target
+                                                                            .value
+                                                                    ),
+                                                            };
+                                                            setJadwal(result);
+                                                        }}
+                                                    >
+                                                        <option value="all">
+                                                            Pilih Hari
+                                                        </option>
+                                                        {hariGuru.map(
+                                                            (item) => (
+                                                                <option
+                                                                    value={item}
+                                                                >
+                                                                    {
+                                                                        hari.filter(
+                                                                            (
+                                                                                h
+                                                                            ) =>
+                                                                                h.id ==
+                                                                                item
+                                                                        )[0]
+                                                                            ?.nama_hari
+                                                                    }
+                                                                </option>
+                                                            )
+                                                        )}
+                                                    </select>
+                                                    <select
+                                                        name="hari_operasional"
+                                                        id="hari_operasional"
+                                                        className="p-2 w-2/5 rounded-md border border-abu-bs"
+                                                        onChange={(e) => {
+                                                            let result = [
+                                                                ...jadwal,
+                                                            ];
+                                                            result[index] = {
+                                                                ...result[
+                                                                    index
+                                                                ],
+                                                                id_jam: parseInt(
+                                                                    e.target
+                                                                        .value
+                                                                ),
+                                                            };
+                                                            setJadwal(result);
+                                                        }}
+                                                    >
+                                                        <option value="all">
+                                                            Pilih Jam
+                                                        </option>
+                                                        {jadwalGuru
+                                                            .filter(
+                                                                (jg) =>
+                                                                    jg?.id_hari ==
+                                                                    jadwal[
+                                                                        index
+                                                                    ]?.id_hari
+                                                            )
+                                                            .map((jg) => (
+                                                                <option
+                                                                    value={
+                                                                        jg.id_jam
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        jam.filter(
+                                                                            (
+                                                                                j
+                                                                            ) =>
+                                                                                j.id ==
+                                                                                jg.id_jam
+                                                                        )[0]
+                                                                            ?.nama_rentang
+                                                                    }
+                                                                </option>
+                                                            ))}
+                                                    </select>
+                                                    <button
+                                                        className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            fixJadwal(
+                                                                jadwal[index]
+                                                            );
+                                                        }}
+                                                    >
+                                                        Set
+                                                    </button>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
-
-                                    <div className="title font-bold mt-8 mb-1">
-                                        <p>
-                                            Atur Hari dan Jam Pertemuan{" "}
-                                            <span className="text-merah-bs">
-                                                *
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div className="w-full h-32 overflow-auto">
-                                        {[
-                                            ...Array(
-                                                jenisPaket.jumlah_pertemuan
-                                            ),
-                                        ].map((item, index) => (
-                                            <div
-                                                className="w-full flex gap-2 mb-1"
-                                                disabled={() =>
-                                                    fixJadwal(jadwal[index])
-                                                }
-                                            >
-                                                <select
-                                                    name="hari_operasional"
-                                                    id="hari_operasional"
-                                                    className="p-2 w-2/5 rounded-md border border-abu-bs"
-                                                    onChange={(e) => {
-                                                        let result = [
-                                                            ...jadwal,
-                                                        ];
-                                                        result[index] = {
-                                                            ...result[index],
-                                                            id_hari: parseInt(
-                                                                e.target.value
-                                                            ),
-                                                        };
-                                                        setJadwal(result);
-                                                    }}
-                                                >
-                                                    <option value="all">
-                                                        Pilih Hari
-                                                    </option>
-                                                    {hariGuru.map((item) => (
-                                                        <option value={item}>
-                                                            {
-                                                                hari.filter(
-                                                                    (h) =>
-                                                                        h.id ==
-                                                                        item
-                                                                )[0]?.nama_hari
-                                                            }
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <select
-                                                    name="hari_operasional"
-                                                    id="hari_operasional"
-                                                    className="p-2 w-2/5 rounded-md border border-abu-bs"
-                                                    onChange={(e) => {
-                                                        let result = [
-                                                            ...jadwal,
-                                                        ];
-                                                        result[index] = {
-                                                            ...result[index],
-                                                            id_jam: parseInt(
-                                                                e.target.value
-                                                            ),
-                                                        };
-                                                        setJadwal(result);
-                                                    }}
-                                                >
-                                                    <option value="all">
-                                                        Pilih Jam
-                                                    </option>
-                                                    {jadwalGuru
-                                                        .filter(
-                                                            (jg) =>
-                                                                jg?.id_hari ==
-                                                                jadwal[index]
-                                                                    ?.id_hari
-                                                        )
-                                                        .map((jg) => (
-                                                            <option
-                                                                value={
-                                                                    jg.id_jam
-                                                                }
-                                                            >
-                                                                {
-                                                                    jam.filter(
-                                                                        (j) =>
-                                                                            j.id ==
-                                                                            jg.id_jam
-                                                                    )[0]
-                                                                        ?.nama_rentang
-                                                                }
-                                                            </option>
-                                                        ))}
-                                                </select>
-                                                <button
-                                                    className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        fixJadwal(
-                                                            jadwal[index]
-                                                        );
-                                                    }}
-                                                >
-                                                    Set
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                                )}
 
                             {/* Total */}
                             <div className="row">
@@ -833,19 +935,29 @@ export default function FormPendaftaran({
                                                 sudah_bayar: e.target.checked,
                                             });
                                         }}
-                                        value={formPendaftaran.sudah_bayar}
+                                        checked={formPendaftaran.sudah_bayar}
                                     />{" "}
                                     Sudah Bayar
                                 </div>
                             </div>
                         </div>
                         <div className="footer-form w-full h-[10%] flex items-center justify-end bg-biru-bs p-4">
-                            <button
-                                className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
-                                onClick={(e) => daftarPeserta(e)}
-                            >
-                                Simpan
-                            </button>
+                            {!formValue.id && (
+                                <button
+                                    className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
+                                    onClick={(e) => daftarPeserta(e)}
+                                >
+                                    Simpan
+                                </button>
+                            )}
+                            {formValue.id && (
+                                <button
+                                    className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
+                                    onClick={(e) => updatePeserta(e)}
+                                >
+                                    Edit
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>

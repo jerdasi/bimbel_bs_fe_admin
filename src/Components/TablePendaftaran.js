@@ -128,7 +128,9 @@ export default function TablePendaftaran() {
     };
 
     const updatePendaftaran = (id) => {
-        console.log(dataPendaftaran.filter((item) => item.id == id));
+        setShow(!show);
+        // console.log(dataPendaftaran.filter((item) => item.id == id)[0]);
+        setPendaftar(dataPendaftaran.filter((item) => item.id == id)[0]);
     };
 
     const hapusPendaftaran = (id) => {
@@ -253,6 +255,7 @@ export default function TablePendaftaran() {
                     setDataPendaftaran={setDataPendaftaran}
                     dataPendaftaran={dataPendaftaran}
                     pendaftar={pendaftar}
+                    setPendaftar={setPendaftar}
                     show={show}
                     setShow={setShow}
                 />
