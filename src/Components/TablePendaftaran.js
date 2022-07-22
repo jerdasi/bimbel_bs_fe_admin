@@ -5,6 +5,7 @@ import FormPendaftaran from "./FormPendaftaran";
 import { DataGrid } from "@mui/x-data-grid";
 import Swal from "sweetalert2";
 import moment from "moment";
+import * as XLSX from "xlsx";
 
 export default function TablePendaftaran() {
     const [dataPendaftaran, setDataPendaftaran] = useState([]);
@@ -127,6 +128,21 @@ export default function TablePendaftaran() {
         });
     };
 
+    const handleOnExport = () => {
+        let wb = XLSX.utils.book_new();
+        let ws = XLSX.utils.json_to_sheet(convertToDataTable(dataPendaftaran));
+
+        XLSX.utils.book_append_sheet(
+            wb,
+            ws,
+            `PendaftaranBS${new Date().toISOString().split("T")[0]}`
+        );
+        XLSX.writeFile(
+            wb,
+            `PendaftaranBS${new Date().toISOString().split(".")[0]}.xlsx`
+        );
+    };
+
     const updatePendaftaran = (id) => {
         setShow(!show);
         // console.log(dataPendaftaran.filter((item) => item.id == id)[0]);
@@ -230,7 +246,10 @@ export default function TablePendaftaran() {
                             />
                         </div>
 
-                        <button className="w-full border border-abu-bs rounded-md hover:bg-merah-bs hover:text-white ml-0 md:ml-4 p-2">
+                        <button
+                            className="w-full border border-abu-bs rounded-md hover:bg-merah-bs hover:text-white ml-0 md:ml-4 p-2"
+                            onClick={handleOnExport}
+                        >
                             Cetak Laporan
                         </button>
                     </div>
