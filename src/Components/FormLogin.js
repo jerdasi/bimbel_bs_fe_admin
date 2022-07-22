@@ -10,6 +10,7 @@ export default function FormLogin() {
     const checkLogin = (event) => {
         event.preventDefault();
         if (username === "admin" && password === "admin") {
+            localStorage.setItem("token", "tes");
             navigate("/dashboard");
             // navigate("/dashboard", { state: { id: 1, id_paket: 1 } });
         } else {

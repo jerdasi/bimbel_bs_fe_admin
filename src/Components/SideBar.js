@@ -154,7 +154,9 @@ export default function SideBar() {
                             onClick={handleLogOut}
                         >
                             <i class="fa-solid fa-arrow-right-from-bracket text-2xl md:text-lg md:mr-2"></i>
-                            <a href="" className="hidden md:inline">
+                            <a href="" className="hidden md:inline" onClick={(e) => {
+                                localStorage.removeItem("token");
+                            }}>
                                 Logout
                             </a>
                         </li>

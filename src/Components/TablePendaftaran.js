@@ -128,19 +128,39 @@ export default function TablePendaftaran() {
         });
     };
 
-    const handleOnExport = () => {
-        let wb = XLSX.utils.book_new();
-        let ws = XLSX.utils.json_to_sheet(convertToDataTable(dataPendaftaran));
+    const handleOnExport = (e) => {
+        e.preventDefault()
+        Swal.fire({
+            title: "Apakah Kamu Yakin?",
+            text: `Kamu akan mendownload laporan dengan rentang dari ${moment(start).format("yyyy-MM-DD")} hingga ${moment(finish).format("yyyy-MM-DD")}`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, Saya Yakin!",
+            cancelButtonText: "Ga AH, Saya Ga Yakin ",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let dataCetak = [...dataPendaftaran]
+                console.log(dataCetak)
+                dataCetak = dataCetak.filter(item => moment(item.tanggal_pendaftaran).format() >= moment(start).format() && moment(item.tanggal_pendaftaran).format() <= moment(finish).format())
+                console.log(dataCetak)
 
-        XLSX.utils.book_append_sheet(
-            wb,
-            ws,
-            `PendaftaranBS${new Date().toISOString().split("T")[0]}`
-        );
-        XLSX.writeFile(
-            wb,
-            `PendaftaranBS${new Date().toISOString().split(".")[0]}.xlsx`
-        );
+                let wb = XLSX.utils.book_new();
+                let ws = XLSX.utils.json_to_sheet(convertToDataTable(dataPendaftaran));
+
+                XLSX.utils.book_append_sheet(
+                    wb,
+                    ws,
+                    `PendaftaranBS${new Date().toISOString().split("T")[0]}`
+                );
+                XLSX.writeFile(
+                    wb,
+                    `PendaftaranBS${new Date().toISOString().split(".")[0]}.xlsx`
+                );
+            }
+        });
+
     };
 
     const updatePendaftaran = (id) => {
