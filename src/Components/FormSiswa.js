@@ -37,12 +37,12 @@ export default function FormSiswa({ handlePeserta, show, setShow, siswa }) {
         event.preventDefault();
 
         if (
-            formData.nama != "" ||
-            formData.tempat != "" ||
-            formData.alamat != "" ||
-            formData.id_jenjang != 0 ||
-            formData.asal_sekolah != "" ||
-            formData.telepon_ayah != "" ||
+            formData.nama != "" &&
+            formData.tempat != "" &&
+            formData.alamat != "" &&
+            formData.id_jenjang != 0 &&
+            formData.asal_sekolah != "" &&
+            formData.telepon_ayah != "" &&
             formData.telepon_ibu != ""
         ) {
             delete formData["id_kelas"];
