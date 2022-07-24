@@ -112,6 +112,10 @@ export default function FormGrup({
         }
     }, [idPaket, formData.id_guru]);
 
+    const setArrayJadwal = () => {
+        console.log(idPaket);
+    };
+
     const handleShow = () => {
         setIdPaket(0);
         setFormData({
@@ -165,29 +169,43 @@ export default function FormGrup({
             formData.id_guru != 0 &&
             formData.kuota != 0
         ) {
-            axios
-                .post(`${process.env.REACT_APP_API}/grup-bimbel`, formData)
-                .then((res) => {
-                    setGrup([...grup, res.data.data]);
-                    daftarJadwal = {
-                        ...daftarJadwal,
-                        id_grup: res.data.data.id,
-                    };
-                    axios
-                        .post(
-                            `${process.env.REACT_APP_API}/jadwal-grup`,
-                            daftarJadwal
-                        )
-                        .then((res) => {
-                            Swal.fire(
-                                "Berhasil",
-                                "Berhasil Menambahkan Grup dan Jadwalnya",
-                                "success"
-                            );
-                            handleShow();
-                        });
-                })
-                .catch((err) => console.log("Gagal" + err.message));
+            let jumlah_pertemuan = paket.filter(
+                (item) => item.id == formData.id_paket
+            )[0]?.jumlah_pertemuan;
+            let checkJadwal = [
+                ...new Set(
+                    convertToIdHariJam().map((item) => item.id_hari_jam)
+                ),
+            ];
+            console.log(jumlah_pertemuan, checkJadwal, "tes");
+            if (checkJadwal.length == jumlah_pertemuan) {
+                axios
+                    .post(`${process.env.REACT_APP_API}/grup-bimbel`, formData)
+                    .then((res) => {
+                        setGrup([...grup, res.data.data]);
+                        daftarJadwal = {
+                            ...daftarJadwal,
+                            id_grup: res.data.data.id,
+                        };
+                        axios
+                            .post(
+                                `${process.env.REACT_APP_API}/jadwal-grup`,
+                                daftarJadwal
+                            )
+                            .then((res) => {
+                                Swal.fire(
+                                    "Berhasil",
+                                    "Berhasil Menambahkan Grup dan Jadwalnya",
+                                    "success"
+                                );
+                                handleShow();
+                            });
+                    })
+                    .catch((err) => console.log("Gagal" + err.message));
+            } else {
+                Swal.fire("Gagal", "Jadwal Pertemuan Ada Yang Double", "error");
+            }
+
             // console.log(formData);
         } else {
             Swal.fire("Gagal", "Pastikan data telah terisi!", "warning");
@@ -213,6 +231,7 @@ export default function FormGrup({
                         return { id_hari, id_jam };
                     }),
                 ];
+                setJadwal([...jadwal]);
                 setJadwal([...new_jadwal]);
                 // console.log({JadwalGrup: res.data.data})
                 // console.log({Operasional: operasional})
@@ -339,10 +358,15 @@ export default function FormGrup({
                                               </div>
                                           ))}
                                 <div
-                                    className="h-12 w-12 bg-merah-bs rounded-md border border-black flex items-center justify-center"
+                                    className="h-12 w-12 bg-merah-bs rounded-md border border-black flex items-center justify-center hover:shadow-inner"
                                     title="Tambah Baru"
                                     onClick={(e) => {
                                         setShowTambahGrup(true);
+                                        setFormData({
+                                            nama_grup: "",
+                                            kuota: 0,
+                                        });
+                                        setArrayJadwal();
                                     }}
                                 >
                                     <i class="fa-solid fa-plus text-2xl text-white"></i>
