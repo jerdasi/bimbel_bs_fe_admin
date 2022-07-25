@@ -3,6 +3,7 @@ import axios from "axios";
 import moment from "moment";
 import { data } from "autoprefixer";
 import Swal from "sweetalert2";
+import Loader from "./SmartComponent/Loader";
 // import { useEffect } from "react";
 
 export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
@@ -15,6 +16,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
     const [pilihanOperasional, setPilihanOperasional] = useState([]);
     const [filterHari, setFilterHari] = useState("all");
     const [grupGuru, setGrupGuru] = useState([]);
+    const [status, setStatus] = useState(false);
 
     const handleShow = () => {
         console.log(show);
@@ -34,7 +36,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
     // Function Tambah Guru Baru
     const tambahGuru = (event) => {
         event.preventDefault();
-
+        setStatus(true);
         const config = {
             headers: { "Content-Type": "multipart/form-data" },
         };
@@ -88,12 +90,14 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                                 "success"
                             );
                             setShow();
+                            setStatus(false);
                         })
                         .catch((err) => console.log(err));
                 })
                 .catch((err) => console.log(err));
         } else {
             Swal.fire("Gagal", "Harap Lengkapi Data Terlebih Dahulu!", "error");
+            setStatus(false);
         }
     };
 
@@ -101,6 +105,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
     const editGuru = (event) => {
         event.preventDefault();
         // delete formData["id_kelas"];
+        setStatus(true);
         const config = {
             headers: { "Content-Type": "multipart/form-data" },
         };
@@ -133,6 +138,7 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                             "Berhasil Merubah Guru dan Jadwal",
                             "success"
                         );
+                        setStatus(false);
                     });
                 handleShow();
                 setGuru({
@@ -685,6 +691,8 @@ export default function FormGuru({ handleGuru, show, setShow, guru, setGuru }) {
                     </form>
                 </div>
             </div>
+
+            <Loader status={status} />
         </div>
     );
 }
