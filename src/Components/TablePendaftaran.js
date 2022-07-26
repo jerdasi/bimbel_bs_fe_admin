@@ -149,12 +149,12 @@ export default function TablePendaftaran() {
                 console.log(dataCetak);
                 dataCetak = dataCetak.filter(
                     (item) =>
-                        moment(item.tanggal_pendaftaran).format() >=
-                            moment(start).format() &&
-                        moment(item.tanggal_pendaftaran).format() <=
-                            moment(finish).format()
+                        moment(item.tanggal_pendaftaran).format("yyyy-MM-DD") >=
+                            moment(start).format("yyyy-MM-DD") &&
+                        moment(item.tanggal_pendaftaran).format("yyyy-MM-DD") <=
+                            moment(finish).format("yyyy-MM-DD")
                 );
-                console.log(dataCetak);
+                // console.log(dataCetak, moment(start).format("yyyy-MM-DD"), moment(finish).format("yyyy-MM-DD"));
 
                 let wb = XLSX.utils.book_new();
                 let ws = XLSX.utils.json_to_sheet(
