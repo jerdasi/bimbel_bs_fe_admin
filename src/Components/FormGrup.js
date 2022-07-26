@@ -177,6 +177,7 @@ export default function FormGrup({
                     convertToIdHariJam().map((item) => item.id_hari_jam)
                 ),
             ];
+            console.log(checkJadwal);
             console.log(jumlah_pertemuan, checkJadwal, "tes");
             if (checkJadwal.length == jumlah_pertemuan) {
                 axios
