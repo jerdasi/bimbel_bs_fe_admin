@@ -51,12 +51,10 @@ export default function TableTestimoni() {
         let nama_siswa = [];
         axios.get(`${process.env.REACT_APP_API}/peserta-didik`).then((res) => {
             nama_siswa = [...res.data.data];
-            setSiswa([...res.data.data]);
-        });
-        axios
+            axios
             .get(`${process.env.REACT_APP_API}/testimoni/pendaftaran`)
-            .then((res) => {
-                let hasil = res.data.data.map((item) => {
+            .then((tp) => {
+                let hasil = tp.data.data.map((item) => {
                     return {
                         ...item,
                         nama: nama_siswa.filter((s) => s.id == item.id_siswa)[0]
@@ -67,6 +65,9 @@ export default function TableTestimoni() {
                 setPendaftaran([...hasil]);
                 setFilterPendaftaran([...hasil]);
             });
+            setSiswa([...res.data.data]);
+        });
+        
     };
 
     // handleTambahEditPeserta
