@@ -129,10 +129,14 @@ export default function TablePendaftaran() {
     };
 
     const handleOnExport = (e) => {
-        e.preventDefault()
+        e.preventDefault();
         Swal.fire({
             title: "Apakah Kamu Yakin?",
-            text: `Kamu akan mendownload laporan dengan rentang dari ${moment(start).format("yyyy-MM-DD")} hingga ${moment(finish).format("yyyy-MM-DD")}`,
+            text: `Kamu akan mendownload laporan dengan rentang dari ${moment(
+                start
+            ).format("yyyy-MM-DD")} hingga ${moment(finish).format(
+                "yyyy-MM-DD"
+            )}`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -141,13 +145,21 @@ export default function TablePendaftaran() {
             cancelButtonText: "Ga AH, Saya Ga Yakin ",
         }).then((result) => {
             if (result.isConfirmed) {
-                let dataCetak = [...dataPendaftaran]
-                console.log(dataCetak)
-                dataCetak = dataCetak.filter(item => moment(item.tanggal_pendaftaran).format() >= moment(start).format() && moment(item.tanggal_pendaftaran).format() <= moment(finish).format())
-                console.log(dataCetak)
+                let dataCetak = [...dataPendaftaran];
+                console.log(dataCetak);
+                dataCetak = dataCetak.filter(
+                    (item) =>
+                        moment(item.tanggal_pendaftaran).format() >=
+                            moment(start).format() &&
+                        moment(item.tanggal_pendaftaran).format() <=
+                            moment(finish).format()
+                );
+                console.log(dataCetak);
 
                 let wb = XLSX.utils.book_new();
-                let ws = XLSX.utils.json_to_sheet(convertToDataTable(dataPendaftaran));
+                let ws = XLSX.utils.json_to_sheet(
+                    convertToDataTable(dataCetak)
+                );
 
                 XLSX.utils.book_append_sheet(
                     wb,
@@ -156,11 +168,12 @@ export default function TablePendaftaran() {
                 );
                 XLSX.writeFile(
                     wb,
-                    `PendaftaranBS${new Date().toISOString().split(".")[0]}.xlsx`
+                    `PendaftaranBS${
+                        new Date().toISOString().split(".")[0]
+                    }.xlsx`
                 );
             }
         });
-
     };
 
     const updatePendaftaran = (id) => {
