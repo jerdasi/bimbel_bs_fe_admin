@@ -77,12 +77,18 @@ export default function TableTestimoni() {
             setTestimoni([...testimoni]);
             // console.log(convertToDataTable(testimoniBaru));
         } else {
-            let hasil = testimoni.findIndex((item) => item.id == id);
-            let tempTestimoni = [...testimoni];
-            tempTestimoni[hasil] = testimoniBaru;
-            setTestimoni([...tempTestimoni]);
-            Swal.fire("Berhasil", "Testimoni Berhasil Diperbarui!", "success");
-            setSingleTestimoni({});
+            axios.put(`${process.env.REACT_APP_API}/testimoni/${id}`, {...testimoniBaru})
+            .then(res => {
+                let hasil = testimoni.findIndex((item) => item.id == id);
+                let tempTestimoni = [...testimoni];
+                tempTestimoni[hasil] = testimoniBaru;
+                setTestimoni([...tempTestimoni]);
+                Swal.fire("Berhasil", "Testimoni Berhasil Diperbarui!", "success");
+                setSingleTestimoni({});
+            }).catch(err => {
+                Swal.fire("Gagal", "Testimoni Gagal Diperbarui!", "error");
+            })
+            
         }
     };
 

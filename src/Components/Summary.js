@@ -81,8 +81,8 @@ export default function Summary() {
                                         {
                                             label: "# Pendaftar SD",
                                             data: [
-                                                12, 19, 3, 5, 2, 3, 12, 19, 3,
-                                                5, 2, 3,
+                                                0, 0, 0, 0, 0, 0, 3, 0, 0,
+                                                0, 0, 0,
                                             ],
                                             borderColor: "red",
                                             backgroundColor: "red",
@@ -90,8 +90,8 @@ export default function Summary() {
                                         {
                                             label: "# Pendaftar SMP",
                                             data: [
-                                                19, 3, 5, 2, 3, 12, 19, 3, 5, 2,
-                                                3, 10,
+                                                0, 0, 0, 0, 0, 0, 1, 0, 0,
+                                                0, 0, 0,
                                             ],
                                             borderColor: "aqua",
                                             backgroundColor: "aqua",
