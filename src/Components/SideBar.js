@@ -22,6 +22,7 @@ export default function SideBar() {
             cancelButtonText: "Ga AH, Saya Ga Yakin ",
         }).then((result) => {
             if (result.isConfirmed) {
+                localStorage.removeItem("token");
                 Swal.fire(
                     "Logout Berhaasil!",
                     "Silahkan Login Kembali",
@@ -154,9 +155,13 @@ export default function SideBar() {
                             onClick={handleLogOut}
                         >
                             <i class="fa-solid fa-arrow-right-from-bracket text-2xl md:text-lg md:mr-2"></i>
-                            <a href="" className="hidden md:inline" onClick={(e) => {
-                                localStorage.removeItem("token");
-                            }}>
+                            <a
+                                href=""
+                                className="hidden md:inline"
+                                onClick={(e) => {
+                                    localStorage.removeItem("token");
+                                }}
+                            >
                                 Logout
                             </a>
                         </li>

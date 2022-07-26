@@ -74,11 +74,16 @@ export default function TableGuru() {
             if (result.isConfirmed) {
                 axios
                     .delete(`${process.env.REACT_APP_API}/guru/${id}`)
-                    .then((res) =>
+                    .then((res) => {
                         setGuru(
                             guru.filter((item) => item.id != res.data.data.id)
-                        )
-                    );
+                        );
+                        Swal.fire(
+                            "Berhasil",
+                            "Berhasil Menghapus Guru Tidak Efektif",
+                            "success"
+                        );
+                    });
             }
         });
     };

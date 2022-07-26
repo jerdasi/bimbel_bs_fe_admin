@@ -84,15 +84,26 @@ export default function TableSiswa() {
             cancelButtonText: "Ga AH, Saya Ga Yakin ",
         }).then((result) => {
             if (result.isConfirmed) {
+                console.log(id);
                 axios
                     .delete(`${process.env.REACT_APP_API}/peserta-didik/${id}`)
-                    .then((res) =>
+                    .then((res) => {
+                        console.log(res.data);
+                        Swal.fire(
+                            "Berhasil",
+                            "Peserta Didik Berhasil di Hapus",
+                            "success"
+                        );
                         setPeserta(
                             peserta.filter(
                                 (item) => item.id != res.data.data.id
                             )
-                        )
-                    );
+                        );
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        // Swal.fire("Gagal", `${err.message}`, "error");
+                    });
             }
         });
     };
@@ -213,7 +224,10 @@ export default function TableSiswa() {
                         </button>
                         <button
                             className="p-2 bg-merah-bs text-white rounded-md border border-merah-bs w-fit"
-                            onClick={(e) => hapusPeserta(params.row.id_peserta)}
+                            onClick={(e) => {
+                                hapusPeserta(params.row.id_peserta);
+                                console.log(params.row.id_peserta);
+                            }}
                         >
                             <i class="fa-solid fa-trash"></i>
                         </button>

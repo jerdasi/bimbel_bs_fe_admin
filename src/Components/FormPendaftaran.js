@@ -356,6 +356,9 @@ export default function FormPendaftaran({
                 let tempPendaftaran = [...dataPendaftaran];
                 tempPendaftaran[hasil] = res.data.data;
                 // console.log(tempPendaftaran);
+                axios
+                    .get(`${process.env.REACT_APP_API}/pendaftaran`)
+                    .then((res) => setDataPendaftaran([...res.data.data]));
                 setDataPendaftaran([...tempPendaftaran]);
                 // setDataPendaftaran([...dataPendaftaran]);
                 // console.log(dataPendaftaran);
