@@ -136,7 +136,9 @@ export default function TableSiswa() {
                 "Tempat/TanggalLahir": `${item.tempat}/${moment(
                     item.tanggal_lahir
                 ).format("DD-MM-YYYY")}`,
-                Jenjang: item.id_jenjang,
+                // Jenjang: item.id_jenjang,
+                Jenjang: jenjang.filter((j) => j.id == item.id_jenjang)[0]
+                    ?.akronim,
                 "Asal Sekolah": item.asal_sekolah,
                 Alamat: item.alamat,
                 Foto: item.foto,
@@ -176,10 +178,10 @@ export default function TableSiswa() {
             field: "Jenjang",
             headerName: "Jenjang",
             width: 70,
-            renderCell: (params) => {
-                return jenjang.filter((j) => j.id == params.row.Jenjang)[0]
-                    ?.akronim;
-            },
+            // renderCell: (params) => {
+            //     return jenjang.filter((j) => j.id == params.row.Jenjang)[0]
+            //         ?.akronim;
+            // },
         },
         { field: "Asal Sekolah", headerName: "Asal Sekolah", width: 100 },
         { field: "Alamat", headerName: "Alamat", width: 200 },
