@@ -10,6 +10,7 @@ import { Line, Bar } from "react-chartjs-2";
 import { useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 ChartJS.register(...registerables);
 
@@ -23,7 +24,7 @@ export default function Summary() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log("Tes");
+        // console.log(moment().year());
         axios
             .get(`${process.env.REACT_APP_API}/pendaftaran/pendaftaran-jenjang`)
             .then((res) => setJumlahPerJenjang(res.data.data));
@@ -35,7 +36,9 @@ export default function Summary() {
             .then((res) => console.log(res.data.data));
         axios
             .get(
-                `${process.env.REACT_APP_API}/pendaftaran/pendaftaran-semua?tahun=2022`
+                `${
+                    process.env.REACT_APP_API
+                }/pendaftaran/pendaftaran-semua?tahun=${moment().year()}`
             )
             .then((res) => {
                 // Membuat Data Graph
