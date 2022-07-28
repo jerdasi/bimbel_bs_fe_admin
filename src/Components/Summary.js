@@ -14,20 +14,16 @@ import { useNavigate } from "react-router-dom";
 ChartJS.register(...registerables);
 
 export default function Summary() {
-    const [paket, setPaket] = useState([
-        "Dog",
-        "Bird",
-        "Cat",
-        "Mouse",
-        "Horse",
-    ]);
+    const [paket, setPaket] = useState([]);
 
     const [jumlahPerJenjang, setJumlahPerJenjang] = useState([]);
     const [jumlahPerPaket, setJumlahPerPaket] = useState([]);
     const [pendaftaran, setPendaftaran] = useState([]);
+    const [total, setTotal] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log("Tes");
         axios
             .get(`${process.env.REACT_APP_API}/pendaftaran/pendaftaran-jenjang`)
             .then((res) => setJumlahPerJenjang(res.data.data));
@@ -37,6 +33,48 @@ export default function Summary() {
         axios
             .get(`${process.env.REACT_APP_API}/pendaftaran/pendaftaran-sukses`)
             .then((res) => console.log(res.data.data));
+        axios
+            .get(
+                `${process.env.REACT_APP_API}/pendaftaran/pendaftaran-semua?tahun=2022`
+            )
+            .then((res) => {
+                // Membuat Data Graph
+                let label = [
+                    ...new Set(res.data.data.map((item) => item.nama_jenjang)),
+                ];
+                setTotal(
+                    res.data.data.reduce(function (acc, cur) {
+                        return acc + cur.jumlah;
+                    }, 0)
+                );
+                setPendaftaran(
+                    label.map((item) => {
+                        let jumlah = Array(12).fill(0);
+                        let warna =
+                            "#" +
+                            (0x1000000 + Math.random() * 0xffffff)
+                                .toString(16)
+                                .substr(1, 6);
+                        res.data.data
+                            .filter((d) => d.nama_jenjang == item)
+                            .map((d) => (jumlah[d.bulan - 1] = d.jumlah));
+                        return {
+                            label: item,
+                            data: jumlah,
+                            borderColor: warna,
+                            backgroundColor: warna,
+                        };
+                    })
+                );
+                // let sekolah_dasar = Array(12).fill(0);
+                // res.data.data
+                //     .filter((item) => item.nama_jenjang == "Sekolah Dasar")
+                //     .map(
+                //         (item) => (sekolah_dasar[item.bulan - 1] = item.jumlah)
+                //     );
+                // console.log(sekolah_dasar);
+                // console.log(label);
+            });
     }, []);
 
     return (
@@ -59,7 +97,7 @@ export default function Summary() {
                         <h1 className="text-2xl font-semibold text-merah-bs">
                             Riwayat Pendaftaran
                         </h1>
-                        <p className="text-sm">1012 Pendaftaran Terjadi</p>
+                        <p className="text-sm">{total} Pendaftaran Terjadi</p>
                         <div className="h-full p-2 md:p-0">
                             <Line
                                 data={{
@@ -77,26 +115,7 @@ export default function Summary() {
                                         "Nov",
                                         "Dec",
                                     ],
-                                    datasets: [
-                                        {
-                                            label: "# Pendaftar SD",
-                                            data: [
-                                                0, 0, 0, 0, 0, 0, 3, 0, 0,
-                                                0, 0, 0,
-                                            ],
-                                            borderColor: "red",
-                                            backgroundColor: "red",
-                                        },
-                                        {
-                                            label: "# Pendaftar SMP",
-                                            data: [
-                                                0, 0, 0, 0, 0, 0, 1, 0, 0,
-                                                0, 0, 0,
-                                            ],
-                                            borderColor: "aqua",
-                                            backgroundColor: "aqua",
-                                        },
-                                    ],
+                                    datasets: [...pendaftaran],
                                 }}
                                 height={200}
                                 width={400}
