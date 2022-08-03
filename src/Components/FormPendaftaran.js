@@ -264,6 +264,7 @@ export default function FormPendaftaran({
                                         );
                                         setDataPendaftaran([...hasil]);
                                         setStatus(false);
+                                        handleShow();
                                         Swal.fire(
                                             "Berhasil",
                                             "Berhasil Mendaftarkan Peserta Didik Baru",
@@ -686,71 +687,78 @@ export default function FormPendaftaran({
                                         </div>
                                     </div>
                                     {/* Grup */}
-                                    <div className="row mb-3 flex-1">
-                                        <div className="title mb-1">
-                                            <p>
-                                                Pilih Grup
-                                                <span className="text-merah-bs">
-                                                    *
-                                                </span>
-                                            </p>
-                                        </div>
-                                        <div className="input-field">
-                                            <select
-                                                name="jenjang"
-                                                id="jenjang"
-                                                className="p-2 border border-abu-bs w-full rounded-md"
-                                                disabled={
-                                                    formPendaftaran.id_paket ==
-                                                    0
-                                                        ? true
-                                                        : false
-                                                }
-                                                onChange={(e) => {
-                                                    setFormPendaftaran({
-                                                        ...formPendaftaran,
-                                                        id_grup: parseInt(
-                                                            e.target.value
-                                                        ),
-                                                    });
-                                                    setFormValue({
-                                                        ...formValue,
-                                                        id_grup: parseInt(
-                                                            e.target.value
-                                                        ),
-                                                    });
-                                                }}
-                                                value={formPendaftaran.id_grup}
-                                            >
-                                                <option
-                                                    value={0}
-                                                    selected
-                                                    disabled
+                                    {paket.filter(
+                                        (item) =>
+                                            item.id == formPendaftaran.id_paket
+                                    )[0]?.kuota == null && (
+                                        <div className="row mb-3 flex-1">
+                                            <div className="title mb-1">
+                                                <p>
+                                                    Pilih Grup
+                                                    <span className="text-merah-bs">
+                                                        *
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <div className="input-field">
+                                                <select
+                                                    name="jenjang"
+                                                    id="jenjang"
+                                                    className="p-2 border border-abu-bs w-full rounded-md"
+                                                    disabled={
+                                                        formPendaftaran.id_paket ==
+                                                        0
+                                                            ? true
+                                                            : false
+                                                    }
+                                                    onChange={(e) => {
+                                                        setFormPendaftaran({
+                                                            ...formPendaftaran,
+                                                            id_grup: parseInt(
+                                                                e.target.value
+                                                            ),
+                                                        });
+                                                        setFormValue({
+                                                            ...formValue,
+                                                            id_grup: parseInt(
+                                                                e.target.value
+                                                            ),
+                                                        });
+                                                    }}
+                                                    value={
+                                                        formPendaftaran.id_grup
+                                                    }
                                                 >
+                                                    <option
+                                                        value={0}
+                                                        selected
+                                                        disabled
+                                                    >
+                                                        {filterGrup(
+                                                            formPendaftaran.id_paket
+                                                        ).length
+                                                            ? "Pilih Salah Satu"
+                                                            : "Tidak Tersedia"}
+                                                    </option>
                                                     {filterGrup(
                                                         formPendaftaran.id_paket
-                                                    ).length
-                                                        ? "Pilih Salah Satu"
-                                                        : "Tidak Tersedia"}
-                                                </option>
-                                                {filterGrup(
-                                                    formPendaftaran.id_paket
-                                                ).map((item) => (
-                                                    <option
-                                                        value={item.id}
-                                                        disabled={
-                                                            item.kuota == 0
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        {item.nama_grup} -{" "}
-                                                        {item.kuota} Tersisa
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                    ).map((item) => (
+                                                        <option
+                                                            value={item.id}
+                                                            disabled={
+                                                                item.kuota == 0
+                                                                    ? true
+                                                                    : false
+                                                            }
+                                                        >
+                                                            {item.nama_grup} -{" "}
+                                                            {item.kuota} Tersisa
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
 
                                 {/* Muncul Jika Private */}
