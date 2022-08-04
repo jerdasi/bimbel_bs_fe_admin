@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import axios from "axios";
 import moment from "moment";
-import { data } from "autoprefixer";
+import {data} from "autoprefixer";
 import Swal from "sweetalert2";
 // import { useEffect } from "react";
 import _ from "lodash";
-import { isCompositeComponentWithType } from "react-dom/test-utils";
+import {isCompositeComponentWithType} from "react-dom/test-utils";
 
 export default function FormGrup({
-    showGroup,
-    setShowGroup,
-    idPaket,
-    setIdPaket,
-}) {
+                                     showGroup,
+                                     setShowGroup,
+                                     idPaket,
+                                     setIdPaket,
+                                 }) {
     const [guru, setGuru] = useState([]);
     const [paket, setPaket] = useState([]);
     const [jenjang, setJenjang] = useState([]);
@@ -66,23 +66,23 @@ export default function FormGrup({
                     setJadwal(
                         [...Array(res.data.data.jumlah_pertemuan)].map(
                             (item) => {
-                                return { id_hari: 0, id_jam: 0 };
+                                return {id_hari: 0, id_jam: 0};
                             }
                         )
                     );
                 });
-            setFormData({ ...formData, id_paket: idPaket });
+            setFormData({...formData, id_paket: idPaket});
             axios
                 .get(
                     `${process.env.REACT_APP_API}/grup-bimbel?paket=${idPaket}`
                 )
                 .then((res) => {
-                    console.log(res.data.data);
                     setGrup(res.data.data);
                 });
         }
+
+        //JIka Guru Telah Terpilih
         if (formData.id_guru != 0 && formData.id_guru != undefined) {
-            console.log("Jalan pas Edit", formData.id_guru);
             axios
                 .get(
                     `${process.env.REACT_APP_API}/waktu-guru?guru=${formData.id_guru}`
@@ -96,6 +96,12 @@ export default function FormGrup({
                         )
                         .then((res) => {
                             jadwalGuruGrup = res.data.data;
+                            // console.log(jadwalGuruGrup.filter(jgg => jgg.id_grup != formData.id))
+                            // Jika mengedit, jadwal grup yang sedang edit tidak ikut di diference agar tetap kelihatan
+                            if (formData.id) {
+                                jadwalGuruGrup = jadwalGuruGrup.filter(jgg => jgg.id_grup != formData.id)
+                            }
+
                             let jadwal_tersisa = _.differenceBy(
                                 waktu_guru,
                                 jadwalGuruGrup,
@@ -109,13 +115,13 @@ export default function FormGrup({
                             setHariGuru([...new Set(hari)]);
                             setJamGuru([...new Set(jam)]);
                         });
-                    console.log(jadwalGuruGrup);
+                    // console.log(jadwalGuruGrup);
                 });
         }
     }, [idPaket, formData.id_guru]);
 
     const setArrayJadwal = () => {
-        console.log(idPaket);
+        // console.log(idPaket);
     };
 
     const handleShow = () => {
@@ -164,7 +170,7 @@ export default function FormGrup({
 
     //Ini untuk daftar grup dan jadwalnya
     const daftarGrup = () => {
-        let daftarJadwal = { id_grup: null, jadwal: convertToIdHariJam() };
+        let daftarJadwal = {id_grup: null, jadwal: convertToIdHariJam()};
         if (
             formData.nama_grup != "" &&
             formData.id_paket != 0 &&
@@ -179,8 +185,6 @@ export default function FormGrup({
                     convertToIdHariJam().map((item) => item.id_hari_jam)
                 ),
             ];
-            console.log(checkJadwal);
-            console.log(jumlah_pertemuan, checkJadwal, "tes");
             if (checkJadwal.length == jumlah_pertemuan) {
                 axios
                     .post(`${process.env.REACT_APP_API}/grup-bimbel`, formData)
@@ -215,6 +219,48 @@ export default function FormGrup({
         }
     };
 
+    const editGrup = () => {
+        axios.get(`${process.env.REACT_APP_API}/jadwal-grup?grup=${formData.id}`)
+            .then(res => {
+                let old_jadwal = res.data.data
+                let new_jadwal = convertToIdHariJam()
+                axios.put(`${process.env.REACT_APP_API}/grup-bimbel/${formData.id}`, {...formData})
+                    .then(() => {
+                        axios.put(`${process.env.REACT_APP_API}/jadwal-grup`, {
+                            id: old_jadwal.map(item => item.id),
+                            jadwal: old_jadwal.map((item, index) => {
+                                return {
+                                    id: old_jadwal[index]?.id,
+                                    id_hari_jam: new_jadwal[index]?.id_hari_jam
+                                }
+                            })
+                        }).then(() => {
+                            Swal.fire("Berhasil", "Berhasil Mengupdate Grup dan Jadwal Bimbingan Belajar", "success")
+                            setShowGroup(false)
+                            setShowTambahGrup(false)
+                            reset()
+                        }).catch(() => {
+                            Swal.fire("Gagal", "Gagal Mengupdate Jadwal Bimbingan Belajar")
+                        })
+                    })
+                    .catch((err) => {
+                        console.log(err, err.message)
+                        Swal.fire("Gagal", "Gagal Mengupdate Grup Bimbingan Belajar", "error")
+                    })
+                // console.log({
+                //     id: old_jadwal.map(item => item.id),
+                //     jadwal: old_jadwal.map((item, index) => {
+                //         return {
+                //             id: old_jadwal[index]?.id,
+                //             id_hari_jam: new_jadwal[index]?.id_hari_jam
+                //         }
+                //     })
+                // })
+            })
+            .catch(() => Swal.fire("Gagal", "Gagal Mengedit Grup Bimbingan Belajar", "error"))
+        console.log(convertToIdHariJam())
+    }
+
     const getGrup = (id) => {
         axios
             .get(`${process.env.REACT_APP_API}/grup-bimbel/${id}`)
@@ -229,12 +275,15 @@ export default function FormGrup({
             .then((res) => {
                 setJadwal([
                     ...res.data.data.map((item) => {
-                        let { id_hari, id_jam } = operasional.filter(
+                        let {id_hari, id_jam} = operasional.filter(
                             (o) => item.id_hari_jam == o.id
                         )[0];
-                        return { id_hari, id_jam };
+                        return {id_hari, id_jam};
                     }),
                 ]);
+                console.log([
+                    res.data.data
+                ])
                 // console.log(new_jadwal);
                 // setJadwal([...jadwal]);
                 // setJadwal([...new_jadwal]);
@@ -308,61 +357,65 @@ export default function FormGrup({
                                         {paket.filter((p) => p.id == idPaket)[0]
                                             ?.nama_paket
                                             ? paket.filter(
-                                                  (p) => p.id == idPaket
-                                              )[0]?.nama_paket
+                                                (p) => p.id == idPaket
+                                            )[0]?.nama_paket
                                             : "Baru"}
                                     </span>
                                 </p>
                             </div>
-                            <div className="w-full h-48 flex flex-col justify-center items-start flex-wrap overflow-auto hide-scrollbar box-border">
+                            <div
+                                className="w-full h-48 flex flex-col justify-center items-start flex-wrap overflow-auto hide-scrollbar box-border">
                                 {grup.length == 0
                                     ? "Belum Ada Grup Terdaftar"
                                     : grup
-                                          .filter(
-                                              (item) =>
-                                                  item.id_paket ==
-                                                  formData.id_paket
-                                          )
-                                          .map((item) => (
-                                              <div
-                                                  className="h-full w-3/5 md:w-1/3 border border-biru-bs rounded-md mr-2 flex justify-center flex items-center hover:bg-merah-bs relative shadow-lg"
-                                                  onClick={(e) => {
-                                                      e.preventDefault();
-                                                      setShowTambahGrup(true);
-                                                      getGrup(item.id);
-                                                      getJadwal(item.id);
-                                                  }}
-                                              >
-                                                  <img
-                                                      src="images/logo-grup.jpg"
-                                                      alt=""
-                                                      className="w-full h-full object-cover rounded-b-md"
-                                                  />
-                                                  <div className="absolute bottom-0 left-0 p-2 bg-merah-bs text-white w-full rounded-b-md tracking-widest">
-                                                      {item.nama_grup} ---{" "}
-                                                      {item.kuota} tersisa
-                                                  </div>
-                                                  <div className="absolute top-0 left-0 p-2 w-full rounded-b-md tracking-widest flex justify-end gap-2">
-                                                      <button
-                                                          className="p-1 border border-black rounded-md w-fit"
-                                                          onClick={(e) => {}}
-                                                      >
-                                                          <i class="fa-solid fa-pen-to-square"></i>
-                                                      </button>
-                                                      <button
-                                                          className="p-1 bg-merah-bs text-white rounded-md border border-merah-bs w-fit"
-                                                          onClick={(e) => {
-                                                              e.preventDefault();
-                                                              hapusGrupBimbel(
-                                                                  item.id
-                                                              );
-                                                          }}
-                                                      >
-                                                          <i class="fa-solid fa-trash"></i>
-                                                      </button>
-                                                  </div>
-                                              </div>
-                                          ))}
+                                        .filter(
+                                            (item) =>
+                                                item.id_paket ==
+                                                formData.id_paket
+                                        )
+                                        .map((item) => (
+                                            <div
+                                                className="h-full w-3/5 md:w-1/3 border border-biru-bs rounded-md mr-2 flex justify-center flex items-center hover:bg-merah-bs relative shadow-lg"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setShowTambahGrup(true);
+                                                    getGrup(item.id);
+                                                    getJadwal(item.id);
+                                                }}
+                                            >
+                                                <img
+                                                    src="images/logo-grup.jpg"
+                                                    alt=""
+                                                    className="w-full h-full object-cover rounded-b-md"
+                                                />
+                                                <div
+                                                    className="absolute bottom-0 left-0 p-2 bg-merah-bs text-white w-full rounded-b-md tracking-widest">
+                                                    {item.nama_grup} ---{" "}
+                                                    {item.kuota} tersisa
+                                                </div>
+                                                <div
+                                                    className="absolute top-0 left-0 p-2 w-full rounded-b-md tracking-widest flex justify-end gap-2">
+                                                    <button
+                                                        className="p-1 border border-black rounded-md w-fit"
+                                                        onClick={(e) => {
+                                                        }}
+                                                    >
+                                                        <i class="fa-solid fa-pen-to-square"></i>
+                                                    </button>
+                                                    <button
+                                                        className="p-1 bg-merah-bs text-white rounded-md border border-merah-bs w-fit"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            hapusGrupBimbel(
+                                                                item.id
+                                                            );
+                                                        }}
+                                                    >
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
                                 <div
                                     className="h-12 w-12 bg-merah-bs rounded-md border border-black flex items-center justify-center hover:shadow-inner"
                                     title="Tambah Baru"
@@ -399,7 +452,7 @@ export default function FormGrup({
                                                     setFormData({
                                                         ...formData,
                                                         nama_grup:
-                                                            e.target.value,
+                                                        e.target.value,
                                                     })
                                                 }
                                                 value={formData.nama_grup}
@@ -469,7 +522,8 @@ export default function FormGrup({
                                         <div className="title mb-1">
                                             <p>Guru</p>
                                         </div>
-                                        <div className="w-full h-48 flex flex-col flex-wrap overflow-auto hide-scrollbar box-border">
+                                        <div
+                                            className="w-full h-48 flex flex-col flex-wrap overflow-auto hide-scrollbar box-border">
                                             {guru.map((item) => (
                                                 <div
                                                     className={[
@@ -493,7 +547,8 @@ export default function FormGrup({
                                                         alt=""
                                                         className="h-full object-cover rounded-md group-hover:blur-sm"
                                                     />
-                                                    <div className="absolute bottom-0 left-0 rounded-b-md w-full p-2 font-bold bg-merah-bs text-white hidden group-hover:block">
+                                                    <div
+                                                        className="absolute bottom-0 left-0 rounded-b-md w-full p-2 font-bold bg-merah-bs text-white hidden group-hover:block">
                                                         {item.nama}
                                                     </div>
                                                 </div>
@@ -606,12 +661,7 @@ export default function FormGrup({
                                                                 value={
                                                                     jg.id_jam
                                                                 }
-                                                                selected={
-                                                                    jg.id_jam ==
-                                                                    item.id_jam
-                                                                        ? true
-                                                                        : false
-                                                                }
+
                                                             >
                                                                 {
                                                                     jam.filter(
@@ -636,7 +686,7 @@ export default function FormGrup({
                                     className="w-1/3 border border-black p-2 rounded-md bg-merah-bs text-white"
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        daftarGrup();
+                                        editGrup();
                                     }}
                                 >
                                     Edit
