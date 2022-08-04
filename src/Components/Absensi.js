@@ -7,12 +7,16 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import FormTestimoni from "./FormTestimoni";
 import _ from "lodash";
+import FormHitung from "./FormHitung";
 
 export default function Absensi() {
     const [guru, setGuru] = useState([]);
+    const [paket, setPaket] = useState([]);
+    const [jenjang, setJenjang] = useState([]);
     const [dataAbsensi, setDataAbsensi] = useState([]);
     const [payload, setPayload] = useState({
         id_guru: 0,
+        id_paket: 0,
         total_jam: 0,
     });
     const [filterAbsensi, setFilterAbsensi] = useState([]);
@@ -22,9 +26,15 @@ export default function Absensi() {
         tanggal_awal: moment().format("yyyy-MM-DD"),
         tanggal_akhir: moment().format("yyyy-MM-DD"),
     });
+    const [show, setShow] = useState(false);
+    const [detail, setDetail] = useState({});
 
     const tambahAbsensi = () => {
-        if (payload.id_guru != 0 && payload.total_jam != 0) {
+        if (
+            payload.id_guru != 0 &&
+            payload.id_paket != 0 &&
+            payload.total_jam != 0
+        ) {
             axios
                 .post(`${process.env.REACT_APP_API}/absensi`, payload)
                 .then((res) => {
@@ -38,8 +48,12 @@ export default function Absensi() {
                     setFilterAbsensi([...hasil]);
                     setPayload({
                         id_guru: 0,
+                        id_paket: 0,
                         total_jam: 0,
                     });
+                })
+                .catch(() => {
+                    Swal.fire("Gagal", "Gagal Menambahkan Absensi", "error");
                 });
         } else {
             alert("Guru dan Jam Kerja Harus Diinnput");
@@ -97,10 +111,70 @@ export default function Absensi() {
         return _.sumBy(arr, (item) => item.total_jam);
     };
 
+    const hitungGaji = () => {
+        if (searchAbsenGuru.id_guru == 0) {
+            Swal.fire("Perhatian", "Pilih Salah Satu Guru Terlebih Dahulu");
+        } else {
+            searchAbsensi();
+            let hasil = dataAbsensi.filter(
+                (item) => item.id_guru == searchAbsenGuru.id_guru
+            );
+            if (searchAbsenGuru.using_time) {
+                hasil = _.filter(
+                    hasil,
+                    (item) =>
+                        moment(item.createdAt).format("yyyy-MM-DD") <=
+                            searchAbsenGuru.tanggal_akhir &&
+                        moment(item.createdAt).format("yyyy-MM-DD") >=
+                            searchAbsenGuru.tanggal_awal
+                );
+            }
+            let detail_absen = [...new Set(hasil.map((item) => item.id_paket))];
+            setDetail({
+                nama_guru: guru.filter(
+                    (g) => g.id == searchAbsenGuru.id_guru
+                )[0]?.nama,
+                tanggal_awal: moment(searchAbsenGuru.tanggal_awal).format(
+                    "DD-MM-yyyy"
+                ),
+                tanggal_akhir: moment(searchAbsenGuru.tanggal_akhir).format(
+                    "DD-MM-yyyy"
+                ),
+                absen_guru: detail_absen.map((item) => {
+                    let nama_paket = paket.filter((p) => p.id == item)[0]
+                        ?.nama_paket;
+                    let nama_jenjang = jenjang.filter(
+                        (j) =>
+                            j.id ==
+                            paket.filter((p) => p.id == item)[0]?.id_jenjang
+                    )[0]?.nama_jenjang;
+                    let total_jam = _.sumBy(
+                        hasil.filter((da) => da.id_paket == item),
+                        (item) => item.total_jam
+                    );
+                    // console.log(total_jam);
+                    console.log();
+
+                    return {
+                        nama_kelas: `${nama_paket} - ${nama_jenjang}`,
+                        total_jam,
+                    };
+                }),
+            });
+            setShow(true);
+        }
+    };
+
     useEffect(() => {
         axios
             .get(`${process.env.REACT_APP_API}/guru`)
             .then((res) => setGuru(res.data.data));
+        axios
+            .get(`${process.env.REACT_APP_API}/paket-bimbingan`)
+            .then((res) => setPaket(res.data.data));
+        axios
+            .get(`${process.env.REACT_APP_API}/jenjang-pendidikan`)
+            .then((res) => setJenjang(res.data.data));
         axios.get(`${process.env.REACT_APP_API}/absensi`).then((res) => {
             setDataAbsensi(res.data.data);
             setFilterAbsensi(res.data.data);
@@ -109,6 +183,12 @@ export default function Absensi() {
 
     return (
         <div className="w-full h-full md:w-4/5 md:h-full md:p-4 flex flex-col pb-8 md:pb-0">
+            <FormHitung
+                show={show}
+                setShow={setShow}
+                filterAbsensi={filterAbsensi}
+                detail={detail}
+            />
             <h1 className="text-3xl font-bold text-merah-bs h-16 border-b border-biru-bs mb-1 flex items-center">
                 Kelola Absensi
             </h1>
@@ -121,7 +201,7 @@ export default function Absensi() {
                         <select
                             name="guru"
                             id="guru"
-                            className="p-2 w-full md:w-1/2 rounded-md border border-abu-bs"
+                            className="p-2 w-full md:w-1/3 rounded-md border border-abu-bs"
                             value={payload.id_guru}
                             onChange={(e) =>
                                 setPayload({
@@ -137,10 +217,36 @@ export default function Absensi() {
                                 <option value={item.id}>{item.nama}</option>
                             ))}
                         </select>
+                        <select
+                            name="paket"
+                            id="paket"
+                            className="p-2 w-full md:w-1/3 rounded-md border border-abu-bs"
+                            value={payload.id_paket}
+                            onChange={(e) =>
+                                setPayload({
+                                    ...payload,
+                                    id_paket: parseInt(e.target.value),
+                                })
+                            }
+                        >
+                            <option value={0} disabled>
+                                Pilih Salah Satu
+                            </option>
+                            {paket.map((item) => (
+                                <option value={item.id}>
+                                    {item.nama_paket} -{" "}
+                                    {
+                                        jenjang.filter(
+                                            (j) => j.id == item.id_jenjang
+                                        )[0]?.nama_jenjang
+                                    }
+                                </option>
+                            ))}
+                        </select>
                         <input
                             type="number"
                             placeholder="Input Total Jam Kerja Hari Ini"
-                            className="p-2 w-full md:w-1/2 rounded-md border border-abu-bs"
+                            className="p-2 w-full md:w-1/3 rounded-md border border-abu-bs"
                             value={payload.total_jam}
                             onChange={(e) =>
                                 setPayload({
@@ -232,6 +338,12 @@ export default function Absensi() {
                         >
                             Cari
                         </button>
+                        <button
+                            className="w-1/2 md:w-1/5 border border-black p-2 rounded-md bg-merah-bs text-white"
+                            onClick={hitungGaji}
+                        >
+                            Hitung Gaji
+                        </button>
                         <p className="w-1/2">
                             <span className="font-bold">Total Jam : </span>
                             {getTotalJam(filterAbsensi)} jam
@@ -267,7 +379,21 @@ export default function Absensi() {
                                             )[0]?.nama
                                         } - ${item.total_jam} Jam / ${moment(
                                             item.createdAt
-                                        ).format("yyyy-MM-DD")}`}
+                                        ).format("yyyy-MM-DD")} / ${
+                                            paket.filter(
+                                                (p) => p.id == item.id_paket
+                                            )[0]?.nama_paket
+                                        } - ${
+                                            jenjang.filter(
+                                                (j) =>
+                                                    j.id ==
+                                                    paket.filter(
+                                                        (p) =>
+                                                            p.id ==
+                                                            item.id_paket
+                                                    )[0]?.id_jenjang
+                                            )[0]?.nama_jenjang
+                                        }`}
                                         <button
                                             className="p-1 mt-1 bg-merah-bs text-white rounded-md border border-merah-bs w-fit absolute right-0 top-0"
                                             onClick={(e) => {

@@ -5,6 +5,7 @@ import { data } from "autoprefixer";
 import Swal from "sweetalert2";
 // import { useEffect } from "react";
 import _ from "lodash";
+import { isCompositeComponentWithType } from "react-dom/test-utils";
 
 export default function FormGrup({
     showGroup,
@@ -57,7 +58,7 @@ export default function FormGrup({
             .then((res) => setJenjang(res.data.data));
 
         // Jika Memilih Sebuah Paket, Maka akan mengambil informasi Paket Tersebut
-        if (idPaket != 0) {
+        if (idPaket != 0 && !formData.id) {
             axios
                 .get(`${process.env.REACT_APP_API}/paket-bimbingan/${idPaket}`)
                 .then((res) => {
@@ -80,7 +81,8 @@ export default function FormGrup({
                     setGrup(res.data.data);
                 });
         }
-        if (formData.id_guru != 0) {
+        if (formData.id_guru != 0 && formData.id_guru != undefined) {
+            console.log("Jalan pas Edit", formData.id_guru);
             axios
                 .get(
                     `${process.env.REACT_APP_API}/waktu-guru?guru=${formData.id_guru}`
@@ -220,20 +222,22 @@ export default function FormGrup({
     };
 
     const getJadwal = (id) => {
+        console.log(jadwalGuru);
         setJadwal([]);
         axios
             .get(`${process.env.REACT_APP_API}/jadwal-grup?grup=${id}`)
             .then((res) => {
-                let new_jadwal = [
+                setJadwal([
                     ...res.data.data.map((item) => {
                         let { id_hari, id_jam } = operasional.filter(
                             (o) => item.id_hari_jam == o.id
                         )[0];
                         return { id_hari, id_jam };
                     }),
-                ];
-                setJadwal([...jadwal]);
-                setJadwal([...new_jadwal]);
+                ]);
+                // console.log(new_jadwal);
+                // setJadwal([...jadwal]);
+                // setJadwal([...new_jadwal]);
                 // console.log({JadwalGrup: res.data.data})
                 // console.log({Operasional: operasional})
                 // console.log({Jadwal: jadwal})
@@ -287,8 +291,7 @@ export default function FormGrup({
                     >
                         <div className="header-form flex items-center relative mb-2 border-b border-abu-bs h-[10%] p-4">
                             <h1 className="text-2xl font-bold text-merah-bs tracking-widest">
-                                Tambah Grup
-                                {/* {formData.id ? "Edit" : "Tambah"} Guru */}
+                                {formData.id ? "Edit" : "Tambah"} Grup
                             </h1>
                             <div
                                 className="close-button text-xl absolute top-0 right-4 cursor-pointer font-bold"
@@ -324,6 +327,8 @@ export default function FormGrup({
                                               <div
                                                   className="h-full w-3/5 md:w-1/3 border border-biru-bs rounded-md mr-2 flex justify-center flex items-center hover:bg-merah-bs relative shadow-lg"
                                                   onClick={(e) => {
+                                                      e.preventDefault();
+                                                      setShowTambahGrup(true);
                                                       getGrup(item.id);
                                                       getJadwal(item.id);
                                                   }}
@@ -569,10 +574,10 @@ export default function FormGrup({
                                                     id="jam_operasional"
                                                     value={
                                                         item.id_jam == 0
-                                                            ? "all"
+                                                            ? item.id_jam
                                                             : item.id_jam
                                                     }
-                                                    className="p-2 w-2/5 rounded-md border border-abu-bs"
+                                                    className="p-2 w-3/5 rounded-md border border-abu-bs"
                                                     onChange={(e) => {
                                                         let result = [
                                                             ...jadwal,
@@ -601,7 +606,12 @@ export default function FormGrup({
                                                                 value={
                                                                     jg.id_jam
                                                                 }
-                                                                selected={true}
+                                                                selected={
+                                                                    jg.id_jam ==
+                                                                    item.id_jam
+                                                                        ? true
+                                                                        : false
+                                                                }
                                                             >
                                                                 {
                                                                     jam.filter(
@@ -614,17 +624,6 @@ export default function FormGrup({
                                                             </option>
                                                         ))}
                                                 </select>
-                                                <button
-                                                    className="w-1/5 p-2 rounded-md border border-abu-bs hover:bg-merah-bs hover:text-white"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        fixJadwal(
-                                                            jadwal[index]
-                                                        );
-                                                    }}
-                                                >
-                                                    Set
-                                                </button>
                                             </div>
                                         ))}
                                     </div>
